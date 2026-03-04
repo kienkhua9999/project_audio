@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { EpisodeList } from "../../components/EpisodeList";
 import { Footer } from "../../components/Footer";
 import { Header } from "../../components/Header";
 import { heroSlides, sections, type VideoItem } from "../../data";
@@ -105,10 +106,7 @@ export default async function DetailPage({ params }: DetailPageProps) {
                 <span className="font-semibold text-white">Lượt xem: </span>
                 {video.views}
               </span>
-              <span>
-                <span className="font-semibold text-white">Thời lượng: </span>
-                {video.duration}
-              </span>
+             
             </div>
 
             {/* Chip thể loại, lấy từ subtitle */}
@@ -136,9 +134,6 @@ export default async function DetailPage({ params }: DetailPageProps) {
                 <span className="tracking-wide">Xem ngay</span>
               </button>
               <button className="inline-flex w-full max-w-xs items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/5 px-10 py-3.5 text-sm md:text-base font-semibold text-white hover:border-white hover:bg-white/10 md:w-[230px] cursor-pointer">
-                <span className="inline-flex h-6 w-6 items-center justify-center rounded text-xs md:text-sm">
-                  ⬇
-                </span>
                 Tải APP
               </button>
             </div>
@@ -173,36 +168,7 @@ export default async function DetailPage({ params }: DetailPageProps) {
             </span>
           </div>
 
-          <div className="space-y-4 rounded-2xl bg-black/40 p-4 md:p-5">
-            {episodes.map((episode) => (
-              <div
-                key={episode.id}
-                className="flex items-start gap-4 rounded-2xl bg-white/5 p-3 text-xs text-zinc-200 md:p-3.5"
-              >
-                <div className="h-[60px] w-[110px] flex-shrink-0 overflow-hidden rounded-xl md:h-[70px] md:w-[120px]">
-                  <img
-                    src={episode.image}
-                    alt={episode.title}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-
-                <div className="flex-1 space-y-1">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h3 className="font-semibold text-white">
-                      {episode.title}
-                    </h3>
-                    <span className="rounded-full bg-white/10 px-3 py-0.5 text-[10px] text-zinc-200">
-                      {episode.duration}
-                    </span>
-                  </div>
-                  <p className="text-[11px] leading-relaxed text-zinc-300 md:text-xs">
-                    {episode.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <EpisodeList episodes={episodes} itemsPerPage={10} />
         </section>
       </main>
 
