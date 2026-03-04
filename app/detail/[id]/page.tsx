@@ -127,12 +127,15 @@ export default async function DetailPage({ params }: DetailPageProps) {
 
             {/* Nút hành động */}
             <div className="flex flex-wrap items-center gap-4">
-              <button className="inline-flex w-full max-w-xs items-center justify-center gap-3 rounded-xl bg-gradient-to-r bg-pink-500 px-10 py-3.5 text-sm md:text-base font-semibold text-white shadow-[0_12px_30px_rgba(0,0,0,0.45)] hover:brightness-110 md:w-[230px] cursor-pointer">
+              <Link
+                href={`/watch/${video.id}`}
+                className="inline-flex w-full max-w-xs items-center justify-center gap-3 rounded-xl bg-gradient-to-r bg-pink-500 px-10 py-3.5 text-sm md:text-base font-semibold text-white shadow-[0_12px_30px_rgba(0,0,0,0.45)] hover:brightness-110 md:w-[230px] cursor-pointer"
+              >
                 <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-xs md:text-sm">
                   ▶
                 </span>
                 <span className="tracking-wide">Xem ngay</span>
-              </button>
+              </Link>
               <button className="inline-flex w-full max-w-xs items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/5 px-10 py-3.5 text-sm md:text-base font-semibold text-white hover:border-white hover:bg-white/10 md:w-[230px] cursor-pointer">
                 Tải APP
               </button>
