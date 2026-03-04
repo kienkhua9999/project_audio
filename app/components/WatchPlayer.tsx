@@ -67,14 +67,14 @@ export function WatchPlayer({
       {/* Player bên trái */}
       <div className="min-w-0 flex-1 self-stretch rounded-3xl bg-black/40 p-5 lg:h-full">
         <div className="mx-auto flex h-full w-full max-w-[420px] flex-col">
-          <div className="relative overflow-hidden rounded-3xl bg-black">
+          <div className="relative rounded-3xl bg-black">
             <video
               key={activeEpisode?.videoUrl}
               src={activeEpisode?.videoUrl}
               controls
               playsInline
               preload="metadata"
-              className="aspect-9/16 w-full bg-black object-cover"
+              className="aspect-9/16 w-full rounded-3xl bg-black object-cover"
             />
 
             <button
@@ -86,33 +86,53 @@ export function WatchPlayer({
             >
               ✕
             </button>
-          </div>
 
-          <div className="mt-4 flex items-center justify-center gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                const prev = Math.max(1, activeEpisodeId - 1);
-                setActiveEpisodeId(prev);
-                setActivePage(Math.ceil(prev / EPISODES_PER_PAGE));
-              }}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/15 cursor-pointer"
-              aria-label="Tập trước"
-            >
-              ˄
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                const next = Math.min(episodes.length, activeEpisodeId + 1);
-                setActiveEpisodeId(next);
-                setActivePage(Math.ceil(next / EPISODES_PER_PAGE));
-              }}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/15 cursor-pointer"
-              aria-label="Tập tiếp"
-            >
-              ˅
-            </button>
+            <div className="absolute -right-14 top-1/2 z-10 hidden -translate-y-1/2 flex-col gap-3 lg:flex">
+              <button
+                type="button"
+                onClick={() => {
+                  const prev = Math.max(1, activeEpisodeId - 1);
+                  setActiveEpisodeId(prev);
+                  setActivePage(Math.ceil(prev / EPISODES_PER_PAGE));
+                }}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-900 text-white backdrop-blur hover:bg-gray-800 cursor-pointer"
+                aria-label="Tập trước"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  className="h-5 w-5"
+                  aria-hidden="true"
+                >
+                  <path d="M6 14l6-6 6 6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const next = Math.min(episodes.length, activeEpisodeId + 1);
+                  setActiveEpisodeId(next);
+                  setActivePage(Math.ceil(next / EPISODES_PER_PAGE));
+                }}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-900 text-white backdrop-blur hover:bg-gray-800 cursor-pointer"
+                aria-label="Tập tiếp"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  className="h-5 w-5"
+                  aria-hidden="true"
+                >
+                  <path d="M6 10l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
