@@ -56,7 +56,7 @@ export function Hero({ slides, autoPlayMs = 5500 }: HeroProps) {
           <p className="text-sm text-zinc-200 md:text-base">{activeSlide.subtitle}</p>
 
           <Link
-            href={`/watch/${activeSlide.id}`}
+            href={`/detail/${activeSlide.id}`}
             className="inline-flex w-fit items-center gap-3 rounded-2xl bg-pink-500 px-10 py-4 text-xl font-bold text-white shadow-xl shadow-pink-500/40 transition hover:scale-[1.02] hover:bg-pink-400"
           >
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/15">
@@ -71,7 +71,7 @@ export function Hero({ slides, autoPlayMs = 5500 }: HeroProps) {
             <button
               key={slide.id}
               onClick={() => setCurrent(index)}
-              className={`h-2.5 rounded-full transition-all duration-500 ${
+              className={`h-2.5 rounded-full transition-all duration-500 cursor-pointer ${
                 index === current ? "w-10 bg-white" : "w-2.5 bg-white/45 hover:bg-white/80"
               }`}
               aria-label={`Chuyển đến slide ${index + 1}`}

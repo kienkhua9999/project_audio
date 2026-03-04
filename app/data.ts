@@ -83,11 +83,8 @@ export const heroSlides: HeroSlide[] = [
 export const categories = [
   "Trang chủ",
   "Phim bộ",
-  "Lồng tiếng",
-  "Tình cảm",
-  "Anime",
-  "Xuyên không",
-  "Huyền huyễn",
+  "Tin tức",
+  "Về chúng tôi",
 ];
 
 export const sections: VideoSectionData[] = [

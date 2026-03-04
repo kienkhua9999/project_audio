@@ -66,7 +66,7 @@ export function Footer() {
             {["f", "▶", "◎", "♪"].map((item) => (
               <button
                 key={item}
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-lg text-zinc-300 hover:bg-white/20"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-lg text-zinc-300 hover:bg-white/20 cursor-pointer"
               >
                 {item}
               </button>
@@ -109,7 +109,7 @@ export function Footer() {
       <button
         type="button"
         onClick={handleScrollTop}
-        className={`fixed bottom-10 right-8 flex h-14 w-14 items-center justify-center rounded-full bg-pink-500 text-3xl font-bold text-white shadow-lg shadow-pink-500/40 transition-all duration-300 hover:bg-pink-400 ${
+        className={`fixed bottom-10 right-8 flex h-14 w-14 items-center justify-center rounded-full bg-pink-500 text-3xl font-bold text-white shadow-lg shadow-pink-500/40 transition-all duration-300 hover:bg-pink-400 cursor-pointer ${
           showScrollTop
             ? "pointer-events-auto translate-y-0 opacity-100"
             : "pointer-events-none translate-y-4 opacity-0"

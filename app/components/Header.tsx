@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { categories } from "../data";
 
 type HeaderProps = {
@@ -5,6 +6,21 @@ type HeaderProps = {
 };
 
 export function Header({ activeCategory }: HeaderProps) {
+  const getHref = (category: string) => {
+    switch (category) {
+      case "Trang chủ":
+        return "/";
+      case "Phim bộ":
+        return "/phimbo";
+      case "Tin tức":
+        return "/tintuc";
+      case "Về chúng tôi":
+        return "/vechungtoi";
+      default:
+        return "#";
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-black/70 backdrop-blur-xl">
       <div className="mx-auto flex w-full max-w-[120rem] items-center justify-between px-5 py-4 md:px-8 lg:px-10">
@@ -15,15 +31,15 @@ export function Header({ activeCategory }: HeaderProps) {
           </div>
           <nav className="hidden items-center gap-10 text-3xl font-bold tracking-tight text-zinc-300 md:flex lg:text-xl">
             {categories.slice(0, 4).map((item) => (
-              <a
+              <Link
                 key={item}
-                href="#"
+                href={getHref(item)}
                 className={`transition hover:text-white ${
                   item === activeCategory ? "text-pink-400" : ""
                 }`}
               >
                 {item}
-              </a>
+              </Link>
             ))}
           </nav>
         </div>
