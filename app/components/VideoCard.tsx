@@ -23,7 +23,7 @@ export function VideoCard({ item }: VideoCardProps) {
     }
   }, [item.id]);
   return (
-    <article className="group min-w-[210px] max-w-[260px] flex-1">
+    <article className="group w-full md:max-w-[260px]">
       <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-zinc-900">
         <img
           src={item.image}

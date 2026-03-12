@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
 
 type Episode = {
   id: number;
+  seriesId: number;
+  episodeNumber: number;
   title: string;
   description: string;
   duration: string;
@@ -39,32 +42,33 @@ export function EpisodeList({ episodes, itemsPerPage = 20 }: EpisodeListProps) {
     <>
       <div className="space-y-4 rounded-2xl">
         {paginatedEpisodes.map((episode) => (
-          <div
+          <Link
             key={episode.id}
-            className="flex items-start gap-4 rounded-2xl bg-white/5 p-3 text-xs text-zinc-200 md:p-3.5"
+            href={`/watch/${episode.id}`}
+            className="flex items-start gap-4 rounded-2xl bg-white/5 p-3 text-xs text-zinc-200 md:p-3.5 transition hover:bg-white/10 group cursor-pointer"
           >
             <div className="h-[60px] w-[110px] flex-shrink-0 overflow-hidden rounded-xl md:h-[200px] md:w-[150px]">
               <img
                 src={episode.image}
                 alt={episode.title}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
               />
             </div>
 
             <div className="flex-1 space-y-1">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 className="font-semibold text-white text-[24px]">
+              <div className="flex flex-wrap items-center justify-between gap-1 md:gap-2">
+                <h3 className="text-base font-semibold text-white md:text-[24px] group-hover:text-pink-400 transition">
                   {episode.title}
                 </h3>
-                <span className="rounded-full bg-white/10 px-3 py-0.5 text-[14px] text-zinc-200">
+                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-zinc-200 md:px-3 md:text-[14px]">
                   {episode.duration}
                 </span>
               </div>
-              <p className="text-[14px] leading-relaxed text-zinc-300 md:text-[16px]">
+              <p className="hidden text-[14px] leading-relaxed text-zinc-300 md:block md:text-[16px] line-clamp-2">
                 {episode.description}
               </p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 

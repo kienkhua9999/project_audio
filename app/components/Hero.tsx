@@ -57,7 +57,7 @@ export function Hero({ slides, autoPlayMs = 5500 }: HeroProps) {
 
           <Link
             href={`/detail/${activeSlide.id}`}
-            className="inline-flex w-fit items-center gap-3 rounded-2xl bg-pink-500 px-10 py-4 text-xl font-bold text-white shadow-xl shadow-pink-500/40 transition hover:scale-[1.02] hover:bg-pink-400"
+            className="inline-flex w-fit items-center gap-3 rounded-2xl bg-pink-500 px-6 py-3 text-lg font-bold text-white shadow-xl shadow-pink-500/40 transition hover:scale-[1.02] hover:bg-pink-400 md:px-10 md:py-4 md:text-xl"
           >
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/15">
               ▶

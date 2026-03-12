@@ -1,9 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMemo, useState, useRef } from "react";
 
 export type WatchEpisode = {
   id: number;
+  episodeNumber: number;
   title: string;
   videoUrl: string;
 };
@@ -31,8 +33,8 @@ export function WatchPlayer({
   episodes,
   initialEpisodeId,
 }: WatchPlayerProps) {
-  const safeInitial = initialEpisodeId ?? episodes[0]?.id ?? 1;
-  const [activeEpisodeId, setActiveEpisodeId] = useState<number>(safeInitial);
+  const router = useRouter();
+  const activeEpisodeId = initialEpisodeId ?? episodes[0]?.id ?? 1;
 
   const activeEpisode = useMemo(() => {
     return episodes.find((e) => e.id === activeEpisodeId) ?? episodes[0];
@@ -58,8 +60,74 @@ export function WatchPlayer({
     });
   }, [episodes.length, totalPages]);
 
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (videoRef.current.paused) {
+        videoRef.current.play();
+      } else {
+        videoRef.current.pause();
+      }
+    }
+  };
+
+  const skipForward = () => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = Math.min(
+        videoRef.current.currentTime + 5,
+        videoRef.current.duration
+      );
+    }
+  };
+
+  const skipBackward = () => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = Math.max(videoRef.current.currentTime - 5, 0);
+    }
+  };
+
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      setCurrentTime(videoRef.current.currentTime);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (videoRef.current) {
+      setDuration(videoRef.current.duration);
+    }
+  };
+
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const time = Number(e.target.value);
+    if (videoRef.current) {
+      videoRef.current.currentTime = time;
+      setCurrentTime(time);
+    }
+  };
+
+  const toggleFullscreen = () => {
+    if (videoRef.current) {
+      if (!document.fullscreenElement) {
+        videoRef.current.parentElement?.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    }
+  };
+
+  const formatTime = (time: number) => {
+    const mins = Math.floor(time / 60);
+    const secs = Math.floor(time % 60);
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
   const handlePickEpisode = (episodeId: number) => {
-    setActiveEpisodeId(episodeId);
+    router.push(`/watch/${episodeId}`);
   };
 
   return (
@@ -67,20 +135,129 @@ export function WatchPlayer({
       {/* Player bên trái */}
       <div className="min-w-0 flex-1 self-stretch rounded-3xl bg-black/40 p-5 lg:h-full">
         <div className="mx-auto flex h-full w-full max-w-[420px] flex-col">
-          <div className="relative rounded-3xl bg-black">
+          <div className="group relative overflow-hidden rounded-3xl bg-black">
             <video
-              key={activeEpisode?.videoUrl}
-              src={activeEpisode?.videoUrl}
-              controls
+              ref={videoRef}
+              key={activeEpisode?.videoUrl || "no-video"}
+              src={activeEpisode?.videoUrl || undefined}
               playsInline
               preload="metadata"
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+              onTimeUpdate={handleTimeUpdate}
+              onLoadedMetadata={handleLoadedMetadata}
               className="aspect-9/16 w-full rounded-3xl bg-black object-cover"
             />
+
+            {/* Overlay to handle play/pause click without conflicting with native controls */}
+            <div 
+              className="absolute inset-0 z-10 cursor-pointer" 
+              onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  togglePlay();
+                }
+              }}
+            />
+
+            {/* Custom Bottom Control Bar */}
+            <div className="absolute inset-x-0 bottom-0 z-30 flex flex-col gap-2 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              {/* Progress Bar */}
+              <input
+                type="range"
+                min={0}
+                max={duration || 100}
+                value={currentTime}
+                onChange={handleSeek}
+                className="h-1 w-full cursor-pointer appearance-none rounded-lg bg-white/20 accent-pink-500"
+                aria-label="Tiến độ video"
+              />
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <button
+                    type="button"
+                    onClick={togglePlay}
+                    className="text-white transition hover:text-pink-400 cursor-pointer"
+                  >
+                    {isPlaying ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6">
+                        <path fillRule="evenodd" d="M6.75 5.25a.75.75 0 0 1 .75.75v12a.75.75 0 0 1-1.5 0v-12a.75.75 0 0 1 .75-.75Zm9 0a.75.75 0 0 1 .75.75v12a.75.75 0 0 1-1.5 0v-12a.75.75 0 0 1 .75-.75Z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6">
+                        <path fillRule="evenodd" d="M4.5 5.653c0-1.427 1.522-2.333 2.727-1.617l12.18 7.32c1.18.706 1.18 2.405 0 3.111l-12.18 7.32c-1.205.716-2.727-.19-2.727-1.617V5.653Z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </button>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={skipBackward}
+                      className="text-white hover:text-pink-400 cursor-pointer"
+                      title="Lùi 5s"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-5 w-5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={skipForward}
+                      className="text-white hover:text-pink-400 cursor-pointer"
+                      title="Tiến 5s"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-5 w-5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <span className="text-xs text-zinc-200">
+                    {formatTime(currentTime)} / {formatTime(duration)}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={toggleFullscreen}
+                  className="text-white hover:text-pink-400 cursor-pointer"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-5 w-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Central Play/Pause Toggle - Only show Play button at the very beginning */}
+            <div className="absolute left-1/2 top-1/2 z-20 flex -translate-x-1/2 -translate-y-1/2 items-center">
+              {!isPlaying && currentTime === 0 && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    togglePlay();
+                  }}
+                  className="flex h-20 w-20 items-center justify-center rounded-full bg-pink-500/80 text-white shadow-2xl backdrop-blur-sm transition hover:scale-110 hover:bg-pink-500 cursor-pointer"
+                  aria-label="Phát video"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="ml-1 h-10 w-10"
+                  >
+                    <path fillRule="evenodd" d="M4.5 5.653c0-1.427 1.522-2.333 2.727-1.617l12.18 7.32c1.18.706 1.18 2.405 0 3.111l-12.18 7.32c-1.205.716-2.727-.19-2.727-1.617V5.653Z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              )}
+            </div>
 
             <button
               type="button"
               onClick={() => window.history.back()}
-              className="absolute left-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-lg text-white backdrop-blur hover:bg-black/75 cursor-pointer"
+              className="absolute left-4 top-4 z-30 inline-flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-lg text-white backdrop-blur hover:bg-black/75 cursor-pointer opacity-0 transition-opacity duration-300 group-hover:opacity-100"
               aria-label="Đóng"
               title="Đóng"
             >
@@ -91,11 +268,13 @@ export function WatchPlayer({
               <button
                 type="button"
                 onClick={() => {
-                  const prev = Math.max(1, activeEpisodeId - 1);
-                  setActiveEpisodeId(prev);
-                  setActivePage(Math.ceil(prev / EPISODES_PER_PAGE));
+                  const currentIndex = episodes.findIndex(e => e.id === activeEpisodeId);
+                  if (currentIndex > 0) {
+                    handlePickEpisode(episodes[currentIndex - 1].id);
+                  }
                 }}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-900 text-white backdrop-blur hover:bg-gray-800 cursor-pointer"
+                disabled={episodes.findIndex(e => e.id === activeEpisodeId) === 0}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-900 text-white backdrop-blur hover:bg-gray-800 disabled:opacity-30 cursor-pointer"
                 aria-label="Tập trước"
               >
                 <svg
@@ -113,11 +292,13 @@ export function WatchPlayer({
               <button
                 type="button"
                 onClick={() => {
-                  const next = Math.min(episodes.length, activeEpisodeId + 1);
-                  setActiveEpisodeId(next);
-                  setActivePage(Math.ceil(next / EPISODES_PER_PAGE));
+                  const currentIndex = episodes.findIndex(e => e.id === activeEpisodeId);
+                  if (currentIndex < episodes.length - 1) {
+                    handlePickEpisode(episodes[currentIndex + 1].id);
+                  }
                 }}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-900 text-white backdrop-blur hover:bg-gray-800 cursor-pointer"
+                disabled={episodes.findIndex(e => e.id === activeEpisodeId) === episodes.length - 1}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-900 text-white backdrop-blur hover:bg-gray-800 disabled:opacity-30 cursor-pointer"
                 aria-label="Tập tiếp"
               >
                 <svg
@@ -169,19 +350,6 @@ export function WatchPlayer({
           {description}
         </p>
 
-        <div className="mt-4 flex items-center gap-3">
-          {["f", "X", "◎", "⛓"].map((icon) => (
-            <button
-              key={icon}
-              type="button"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/55 cursor-pointer"
-              aria-label="Chia sẻ"
-            >
-              {icon}
-            </button>
-          ))}
-        </div>
-
         {/* Tabs page */}
         {totalPages > 1 ? (
           <div className="mt-6 flex flex-wrap items-center gap-3 text-xs text-zinc-300">
@@ -206,7 +374,7 @@ export function WatchPlayer({
         ) : null}
 
         {/* Grid episode picker */}
-        <div className="mt-4 grid grid-cols-6 gap-2">
+        <div className="mt-4 grid grid-cols-5 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-6">
           {pageEpisodes.map((e) => (
             <button
               key={e.id}
@@ -219,7 +387,7 @@ export function WatchPlayer({
               }`}
               aria-label={`Chọn tập ${e.id}`}
             >
-              {e.id}
+              {e.episodeNumber}
             </button>
           ))}
         </div>

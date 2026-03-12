@@ -29,7 +29,7 @@ export function VideoSection({ section }: VideoSectionProps) {
       </div>
 
       <div className="relative">
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
           {visibleItems.map((item) => (
             <VideoCard key={item.id} item={item} />
           ))}

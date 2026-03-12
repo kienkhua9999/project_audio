@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { EpisodeList } from "../../components/EpisodeList";
 import { Footer } from "../../components/Footer";
 import { Header } from "../../components/Header";
-import { heroSlides, sections, type VideoItem } from "../../data";
 
 type DetailPageProps = {
   params: Promise<{
@@ -11,56 +11,74 @@ type DetailPageProps = {
   }>;
 };
 
-function findVideoById(id: number): VideoItem | null {
-  for (const section of sections) {
-    const found = section.items.find((item) => item.id === id);
-    if (found) return found;
+type Episode = {
+  id: number;
+  episodeNumber: number;
+  title: string;
+  duration: number;
+  videoUrl: string;
+  thumbnailUrl: string;
+};
+
+type SeriesDetail = {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+  tags: string[];
+  type: string;
+  views: number;
+  status: string;
+  isExclusive: boolean;
+  hasAds: boolean;
+  createdAt: string;
+  updatedAt: string;
+  episodes: Episode[];
+  totalEpisodes: number;
+};
+
+async function fetchJson<T>(url: string): Promise<T> {
+  const res = await fetch(url, { next: { revalidate: 60 } });
+  if (!res.ok) {
+    throw new Error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
   }
-
-  const hero = heroSlides.find((slide) => slide.id === id);
-  if (!hero) return null;
-
-  // Map HeroSlide -> VideoItem tối thiểu để hiển thị
-  return {
-    id: hero.id,
-    title: hero.title,
-    subtitle: hero.subtitle,
-    views: "Đang cập nhật",
-    duration: "01:30",
-    image: hero.background,
-    tag: hero.tag,
-  };
-}
-
-function generateEpisodes(baseTitle: string) {
-  // Tạo danh sách tập mock giống layout trong ảnh
-  return Array.from({ length: 20 }).map((_, index) => {
-    const episodeNumber = index + 1;
-    return {
-      id: episodeNumber,
-      title: `Tập ${episodeNumber} - ${baseTitle}`,
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Mô tả này chỉ là dữ liệu giả để minh họa giao diện.",
-      duration: "23:45",
-      image:
-        "https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=crop&w=600&q=80",
-    };
-  });
+  const text = await res.text();
+  try {
+    return JSON.parse(text) as T;
+  } catch (err) {
+    console.error(`Failed to parse JSON from ${url}. Content:`, text);
+    throw err;
+  }
 }
 
 export default async function DetailPage({ params }: DetailPageProps) {
   const { id: idParam } = await params;
-  const id = Number(idParam);
-  if (Number.isNaN(id)) {
-    notFound();
+  const baseUrl = process.env.BASE_URL ?? "";
+  
+  const headersList = await headers();
+  const referer = headersList.get("referer") || "/";
+
+  let series: SeriesDetail;
+  try {
+    series = await fetchJson<SeriesDetail>(`${baseUrl}/series/${idParam}`);
+  } catch (error) {
+    console.error("Error fetching series detail:", error);
+    redirect(referer);
   }
 
-  const video = findVideoById(id);
-  if (!video) {
-    notFound();
-  }
+  const episodes = series.episodes.map((ep) => ({
+    id: ep.id,
+    seriesId: series.id,
+    episodeNumber: ep.episodeNumber,
+    title: `Tập ${ep.episodeNumber} - ${series.title}`,
+    description: series.description, // API response sample shows episodes have no description, so we use series description or a default
+    duration: `${ep.duration}:00`,
+    image: ep.thumbnailUrl || series.image,
+  }));
 
-  const episodes = generateEpisodes(video.title);
+  if (episodes.length === 0) {
+    redirect("/");
+  }
 
   return (
     <div className="min-h-screen bg-[#06070b] text-white">
@@ -69,94 +87,82 @@ export default async function DetailPage({ params }: DetailPageProps) {
       <main className="mx-auto w-full max-w-[120rem] px-5 py-8 md:px-8 lg:px-10">
         {/* Breadcrumb */}
         <nav className="mb-4 text-xs md:text-sm text-zinc-400">
-          <Link href="/" className="hover:text-white">
+          <Link href="/" className="hover:text-white transition">
             Trang chủ
           </Link>
           <span className="mx-1.5 text-zinc-500">{">"}</span>
-          <span className="hover:text-white cursor-pointer text-zinc-300">
+          <span className="hover:text-white cursor-pointer text-zinc-300 transition">
             Phim hấp dẫn
           </span>
           <span className="mx-1.5 text-zinc-500">{">"}</span>
-          <span className="text-white">{video.title}</span>
+          <span className="text-white">{series.title}</span>
         </nav>
 
-        {/* Khối thông tin chính */}
-        <section className="mt-6 flex flex-col gap-8 md:flex-row md:items-start">
-          {/* Cột poster bên trái */}
-          <div className="w-full max-w-[260px] md:w-[260px] lg:max-w-[300px]">
-            <div className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900">
+        {/* Phần poster + Info giới thiệu */}
+        <section className="flex flex-col items-center gap-y-8 md:flex-row md:items-start">
+          <div className="w-full max-w-[260px] flex-shrink-0 md:w-[260px] lg:max-w-[300px]">
+            <div className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 shadow-2xl">
               <img
-                src={video.image}
-                alt={video.title}
-                className="aspect-[4/5] w-full object-cover"
+                src={series.image}
+                alt={series.title}
+                className="aspect-[4/5] w-full object-cover transition duration-500 hover:scale-105"
               />
             </div>
           </div>
 
           {/* Khối thông tin bên phải ảnh, bố cục giống Netshort */}
-          <div className="mt-4 flex flex-1 flex-col gap-5 md:mt-0 md:pl-10">
+          <div className="mt-6 flex flex-1 flex-col items-center gap-5 text-center md:mt-0 md:items-start md:pl-10 md:text-left">
             {/* Tiêu đề lớn */}
             <h1 className="text-3xl font-bold md:text-4xl lg:text-5xl">
-              {video.title}
+              {series.title}
             </h1>
 
             {/* Dòng lượt xem + thời lượng */}
-            <div className="flex flex-wrap items-center gap-8 text-sm md:text-base text-zinc-300">
+            <div className="flex flex-wrap items-center justify-center gap-8 text-sm md:justify-start md:text-base text-zinc-300">
               <span>
                 <span className="font-semibold text-white">Lượt xem: </span>
-                {video.views}
+                {series.views.toLocaleString()}
               </span>
-             
             </div>
 
             {/* Chip thể loại, lấy từ subtitle */}
-            <div className="flex flex-wrap gap-3">
-              {video.subtitle
-                .split("•")
-                .map((part) => part.trim())
-                .filter(Boolean)
-                .map((part) => (
-                  <span
-                    key={part}
-                    className="rounded-full border border-white/15 px-4 py-1.5 text-xs md:text-sm font-medium text-zinc-100"
-                  >
-                    {part}
-                  </span>
-                ))}
+            <div className="flex flex-wrap justify-center gap-3 md:justify-start">
+              {series.tags.map((tag: string) => (
+                <span
+                  key={tag}
+                  className="rounded-full border border-pink-500/30 bg-pink-500/5 px-4 py-1.5 text-xs md:text-sm font-medium text-pink-300 transition hover:bg-pink-500/10"
+                >
+                  {tag}
+                </span>
+              ))}
+              {series.type && (
+                <span className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs md:text-sm font-medium text-zinc-100">
+                  {series.type}
+                </span>
+              )}
             </div>
 
             {/* Nút hành động */}
             <div className="flex flex-wrap items-center gap-4">
               <Link
-                href={`/watch/${video.id}`}
-                className="inline-flex w-full max-w-xs items-center justify-center gap-3 rounded-xl bg-gradient-to-r bg-pink-500 px-10 py-3.5 text-sm md:text-base font-semibold text-white shadow-[0_12px_30px_rgba(0,0,0,0.45)] hover:brightness-110 md:w-[230px] cursor-pointer"
+                href={`/watch/${episodes[0].id}`}
+                className="flex w-full items-center justify-center gap-3 rounded-xl bg-pink-500 px-10 py-3.5 text-sm md:text-base font-semibold text-white shadow-lg shadow-pink-500/25 transition hover:brightness-110 active:scale-[0.98] md:w-auto"
               >
-                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-xs md:text-sm">
-                  ▶
-                </span>
-                <span className="tracking-wide">Xem ngay</span>
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3">
+                    <path fillRule="evenodd" d="M4.5 5.653c0-1.427 1.522-2.333 2.727-1.617l12.18 7.32c1.18.706 1.18 2.405 0 3.111l-12.18 7.32c-1.205.716-2.727-.19-2.727-1.617V5.653Z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <span>Xem ngay</span>
               </Link>
-              <button className="inline-flex w-full max-w-xs items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/5 px-10 py-3.5 text-sm md:text-base font-semibold text-white hover:border-white hover:bg-white/10 md:w-[230px] cursor-pointer">
-                Tải APP
-              </button>
             </div>
           </div>
         </section>
 
         {/* Mô tả dưới cả poster + info */}
         <section className="mt-6">
-          <div className="space-y-2 rounded-2xl bg-white/5 p-4 text-sm text-zinc-200 md:text-[15px]">
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam eget
-              neque sed urna elementum ultricies. Nội dung ở đây bạn có thể thay
-              bằng mô tả thật của bộ phim hoặc series, nói về bối cảnh, nhân vật
-              chính và lý do vì sao nên xem.
-            </p>
-            <p>
-              Phần này hiện tại chỉ là mô tả mẫu để tạo cảm giác giống giao diện
-              Netshort trong ảnh bạn gửi. Khi kết nối API thật, bạn có thể lấy
-              mô tả chi tiết từ backend và hiển thị vào đây.
-            </p>
+          <div className="rounded-2xl bg-white/5 p-6 text-[15px] leading-relaxed text-zinc-300">
+            {series.description}
           </div>
         </section>
 
