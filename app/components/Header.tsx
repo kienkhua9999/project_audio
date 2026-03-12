@@ -31,7 +31,7 @@ export function Header({ activeCategory }: HeaderProps) {
       <div className="mx-auto flex w-full max-w-[120rem] items-center justify-between px-5 py-4 md:px-8 lg:px-10">
         <div className="flex items-center gap-10">
           <Link href="/" className="flex items-center gap-2 text-lg font-bold text-white">
-            <span className="inline-block h-7 w-7 rounded-lg bg-gradient-to-br from-pink-500 to-orange-400" />
+            <img src="/logo1.png" alt="NetChill Logo" className="h-10 w-auto object-contain" />
             NetChill
           </Link>
           
