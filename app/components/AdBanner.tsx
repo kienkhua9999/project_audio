@@ -26,6 +26,8 @@ export default function AdBanner({ id, width, height, className }: AdBannerProps
     iframe.scrolling = "no";
     iframe.style.border = "none";
     iframe.style.overflow = "hidden";
+    iframe.style.display = "block";
+    iframe.style.verticalAlign = "top";
     
     containerRef.current.appendChild(iframe);
 

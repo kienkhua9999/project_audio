@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-// import Script from "next/script";
+import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -30,7 +30,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         {/* popunder */}
-       {/* <Script src="https://pl28850045.effectivegatecpm.com/fb/6f/87/fb6f87d26b7d7e4d1afc6f8ee65d73c5.js" strategy="afterInteractive" /> */}
+       <Script src="https://pl28850045.effectivegatecpm.com/fb/6f/87/fb6f87d26b7d7e4d1afc6f8ee65d73c5.js" strategy="afterInteractive" />
         {children}
       </body>
     </html>

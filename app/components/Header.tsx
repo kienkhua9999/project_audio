@@ -81,6 +81,11 @@ export function Header({ activeCategory }: HeaderProps) {
               </nav>
             </div>
 
+            {/* Banner ad next to menu */}
+            <div className="hidden h-[60px] w-[468px] items-center justify-center overflow-hidden lg:flex">
+              <AdBanner id="9e8ee2cfb56287b0e7bb83a8a0d0b922" width={468} height={60} />
+            </div>
+
             <div className="flex items-center gap-4">
               <div className="hidden w-full max-w-[200px] items-center rounded-full border border-white/15 bg-white/5 px-4 py-1.5 md:flex lg:max-w-xs">
                 <input
