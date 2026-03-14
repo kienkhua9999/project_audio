@@ -1,13 +1,40 @@
 "use client";
 
 import Link from "next/link";
-import Script from "next/script";
 import { useState } from "react";
+import AdBanner from "./AdBanner";
 import { categories } from "../data";
 
 type HeaderProps = {
   activeCategory: string;
 };
+
+const topDesktopKeys = [
+  "9e8ee2cfb56287b0e7bb83a8a0d0b922",
+  "9e8ee2cfb56287b0e7bb83a8a0d0b922",
+  "9e8ee2cfb56287b0e7bb83a8a0d0b922",
+  "9e8ee2cfb56287b0e7bb83a8a0d0b922",
+];
+
+const topMobileKeys = [
+  "d85056a55adf2565c57f2d5feb6679d9",
+  "d85056a55adf2565c57f2d5feb6679d9",
+  "d85056a55adf2565c57f2d5feb6679d9",
+];
+
+const bottomDesktopKeys = [
+  "d85056a55adf2565c57f2d5feb6679d9",
+  "d85056a55adf2565c57f2d5feb6679d9",
+  "d85056a55adf2565c57f2d5feb6679d9",
+  "d85056a55adf2565c57f2d5feb6679d9",
+];
+
+const bottomMobileKeys = [
+  "d85056a55adf2565c57f2d5feb6679d9",
+  "d85056a55adf2565c57f2d5feb6679d9",
+  "d85056a55adf2565c57f2d5feb6679d9",
+  "d85056a55adf2565c57f2d5feb6679d9",
+];
 
 export function Header({ activeCategory }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -31,59 +58,7 @@ export function Header({ activeCategory }: HeaderProps) {
   return (
     <>
       <header className="border-b border-white/10 bg-black/80 backdrop-blur-xl">
-        <Script
-          id="ad-config-desktop"
-          strategy="afterInteractive"
-        >{`
-  atOptions = {
-    'key' : '9e8ee2cfb56287b0e7bb83a8a0d0b922',
-    'format' : 'iframe',
-    'height' : 60,
-    'width' : 468,
-    'params' : {}
-  };
-`}</Script>
-        <Script
-          src="https://www.highperformanceformat.com/9e8ee2cfb56287b0e7bb83a8a0d0b922/invoke.js"
-          strategy="afterInteractive"
-        />
-        <Script
-          id="ad-config-mobile"
-          strategy="afterInteractive"
-        >{`
-  atOptions = {
-    'key' : 'd85056a55adf2565c57f2d5feb6679d9',
-    'format' : 'iframe',
-    'height' : 50,
-    'width' : 320,
-    'params' : {}
-  };
-`}</Script>
-        <Script
-          src="https://www.highperformanceformat.com/d85056a55adf2565c57f2d5feb6679d9/invoke.js"
-          strategy="afterInteractive"
-        />
         <div className="mx-auto flex w-full max-w-[120rem] flex-col gap-3 px-5 py-3 md:px-8 lg:px-10">
-          <div className="grid w-full gap-3 lg:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <div
-                key={`ad-top-desktop-${index}`}
-                data-ad-slot="desktop"
-                className="hidden h-[60px] w-full overflow-hidden rounded border border-white/10 bg-black/40 lg:block"
-              />
-            ))}
-          </div>
-
-          <div className="grid w-full grid-cols-2 gap-3 lg:hidden">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <div
-                key={`ad-top-mobile-${index}`}
-                data-ad-slot="mobile"
-                className="h-[50px] w-full overflow-hidden rounded border border-white/10 bg-black/40"
-              />
-            ))}
-          </div>
-
           <div className="flex w-full items-center justify-between">
             <div className="flex items-center gap-10">
               <Link href="/" className="flex items-center gap-2 text-lg font-bold text-white">
@@ -135,40 +110,73 @@ export function Header({ activeCategory }: HeaderProps) {
         </div>
       </header>
 
-      {showBottomAds ? (
-        <div className="border-b border-white/10 bg-black/80 backdrop-blur-xl">
-          <div className="mx-auto flex w-full max-w-[120rem] items-center gap-3 px-5 py-2 md:px-8 lg:px-10">
-            <div className="grid w-full gap-3 lg:grid-cols-4">
-              {Array.from({ length: 4 }).map((_, index) => (
-                <div
-                  key={`ad-bottom-desktop-${index}`}
-                  data-ad-slot="desktop"
-                  className="hidden h-[60px] w-full overflow-hidden rounded border border-white/10 bg-black/40 lg:block"
-                />
-              ))}
-            </div>
+      {/* Ads Below Menu */}
+      <div className="mx-auto w-full max-w-[120rem] px-5 py-4 md:px-8 lg:px-10">
+        <div className="flex flex-col items-center">
+          <div className="grid grid-cols-1 gap-1 md:grid-cols-2">
+            {topDesktopKeys.slice(0, 4).map((key, index) => (
+              <div
+                key={`ad-under-menu-${index}`}
+                className="hidden h-[60px] w-[468px] items-center justify-center overflow-hidden lg:flex"
+              >
+                <AdBanner id={key} width={468} height={60} />
+              </div>
+            ))}
+          </div>
+          
+          {/* Mobile version of ads below menu */}
+          <div className="grid grid-cols-1 gap-1 lg:hidden">
+            {topMobileKeys.slice(0, 2).map((key, index) => (
+              <div
+                key={`ad-under-menu-mobile-${index}`}
+                className="flex h-[50px] w-[320px] items-center justify-center overflow-hidden"
+              >
+                <AdBanner id={key} width={320} height={50} />
+              </div>
+            ))}
+          </div>
 
-            <div className="grid w-full grid-cols-2 gap-3 lg:hidden">
-              {Array.from({ length: 4 }).map((_, index) => (
-                <div
-                  key={`ad-bottom-mobile-${index}`}
-                  data-ad-slot="mobile"
-                  className="h-[50px] w-full overflow-hidden rounded border border-white/10 bg-black/40"
-                />
-              ))}
-            </div>
+        </div>
+      </div>
 
+      {/* Fixed Bottom Ads Container */}
+      {showBottomAds && (
+        <div className="fixed bottom-0 left-0 right-0 z-[100]">
+          <div className="mx-auto flex flex-col items-center">
             <button
               type="button"
               onClick={() => setShowBottomAds(false)}
-              className="ml-2 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/15 text-sm text-white/70 hover:text-white"
-              aria-label="Đóng quảng cáo"
+              className="flex items-center gap-1 rounded bg-orange-500 px-3 py-0.5 text-[10px] font-bold uppercase text-white hover:bg-orange-600"
             >
-              ✕
+              Tắt QC ✕
             </button>
+
+            {/* Desktop Fixed Ads: 2x2 cluster, no gaps */}
+            <div className="hidden max-w-[936px] flex-wrap items-start justify-center leading-[0] lg:flex">
+              {bottomDesktopKeys.map((key, index) => (
+                <div
+                  key={`ad-fixed-bottom-${index}`}
+                  className="h-[60px] w-[468px] overflow-hidden"
+                >
+                  <AdBanner id={key} width={468} height={60} />
+                </div>
+              ))}
+            </div>
+
+            {/* Mobile Fixed Ads: 2x2 cluster, no gaps */}
+            <div className="flex flex-wrap items-center justify-center leading-[0] lg:hidden">
+              {bottomMobileKeys.slice(0, 4).map((key, index) => (
+                <div
+                  key={`ad-fixed-bottom-mobile-${index}`}
+                  className="h-[50px] w-[160px] overflow-hidden"
+                >
+                  <AdBanner id={key} width={160} height={50} />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      ) : null}
+      )}
 
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
