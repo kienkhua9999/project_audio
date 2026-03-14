@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import Script from "next/script";
+import { useState } from "react";
 import { categories } from "../data";
 
 type HeaderProps = {
@@ -11,7 +12,6 @@ type HeaderProps = {
 export function Header({ activeCategory }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showBottomAds, setShowBottomAds] = useState(true);
-  const adInjected = useRef(false);
 
   const getHref = (category: string) => {
     switch (category) {
@@ -28,41 +28,41 @@ export function Header({ activeCategory }: HeaderProps) {
     }
   };
 
-  useEffect(() => {
-    if (adInjected.current) return;
-
-    const injectScripts = (selector: string, key: string, width: number, height: number) => {
-      const nodes = Array.from(document.querySelectorAll<HTMLElement>(selector));
-      nodes.forEach((node) => {
-        if (node.querySelector("script")) return;
-        const script = document.createElement("script");
-        script.type = "text/javascript";
-        script.innerHTML = `
-  atOptions = {
-    'key' : '${key}',
-    'format' : 'iframe',
-    'height' : ${height},
-    'width' : ${width},
-    'params' : {}
-  };
-`;
-        const invoke = document.createElement("script");
-        invoke.type = "text/javascript";
-        invoke.src = `https://www.highperformanceformat.com/${key}/invoke.js`;
-        node.appendChild(script);
-        node.appendChild(invoke);
-      });
-    };
-
-    injectScripts("[data-ad-slot=\"desktop\"]", "9e8ee2cfb56287b0e7bb83a8a0d0b922", 468, 60);
-    injectScripts("[data-ad-slot=\"mobile\"]", "d85056a55adf2565c57f2d5feb6679d9", 320, 50);
-
-    adInjected.current = true;
-  }, []);
-
   return (
     <>
       <header className="border-b border-white/10 bg-black/80 backdrop-blur-xl">
+        <Script
+          id="ad-config-desktop"
+          strategy="afterInteractive"
+        >{`
+  atOptions = {
+    'key' : '9e8ee2cfb56287b0e7bb83a8a0d0b922',
+    'format' : 'iframe',
+    'height' : 60,
+    'width' : 468,
+    'params' : {}
+  };
+`}</Script>
+        <Script
+          src="https://www.highperformanceformat.com/9e8ee2cfb56287b0e7bb83a8a0d0b922/invoke.js"
+          strategy="afterInteractive"
+        />
+        <Script
+          id="ad-config-mobile"
+          strategy="afterInteractive"
+        >{`
+  atOptions = {
+    'key' : 'd85056a55adf2565c57f2d5feb6679d9',
+    'format' : 'iframe',
+    'height' : 50,
+    'width' : 320,
+    'params' : {}
+  };
+`}</Script>
+        <Script
+          src="https://www.highperformanceformat.com/d85056a55adf2565c57f2d5feb6679d9/invoke.js"
+          strategy="afterInteractive"
+        />
         <div className="mx-auto flex w-full max-w-[120rem] flex-col gap-3 px-5 py-3 md:px-8 lg:px-10">
           <div className="grid w-full gap-3 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, index) => (
