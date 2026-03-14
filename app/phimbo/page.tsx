@@ -1,7 +1,5 @@
 import Link from "next/link";
 
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
 import { Footer } from "../components/Footer";
 import { Header } from "../components/Header";
 
@@ -91,8 +89,6 @@ export default async function PhimBoPage({ searchParams }: PhimBoPageProps) {
   const currentPage = Math.max(1, Number(resolvedSearchParams?.page ?? 1));
   const currentType = resolvedSearchParams?.type || "";
 
-  const headersList = await headers();
-  const referer = headersList.get("referer") || "/";
 
   const limit = 18;
   let phimBoItems: SeriesItem[] = [];
@@ -113,7 +109,9 @@ export default async function PhimBoPage({ searchParams }: PhimBoPageProps) {
 
   } catch (error) {
     console.error("Failed to fetch series:", error);
-    redirect(referer);
+    // Remove redirect(referer) to prevent infinite loop if fetch fails
+    phimBoItems = [];
+    totalPages = 1;
   }
 
   const pageNumbers = buildPageNumbers(currentPage, totalPages);
