@@ -34,26 +34,6 @@ type PhimBoPageProps = {
   }>;
 };
 
-const filterChips = [
-  "Tất cả",
-  "Gia đình",
-  "Đô thị",
-  "Con gái",
-  "Hiện đại",
-  "Tát vào mặt",
-  "CEO",
-  "Em bé dễ thương",
-  "Tình một đêm",
-  "Tái sinh",
-  "Con gái thật giả",
-  "Đoàn sủng",
-  "Ngôn tình cổ đại",
-  "Phụ nữ độc lập",
-  "Che giấu danh tính",
-  "Nữ CEO",
-  "Cung điện",
-];
-
 async function fetchJson<T>(url: string): Promise<T> {
   const res = await fetch(url, { next: { revalidate: 60 } });
   if (!res.ok) {
@@ -128,28 +108,6 @@ export default async function PhimBoPage({ searchParams }: PhimBoPageProps) {
           <p className="text-xs text-zinc-500">Trang chủ &gt; Phim bộ</p>
 
           <h1 className="mt-5 text-3xl font-bold tracking-tight md:text-4xl">Tất cả các phim</h1>
-
-          <div className="mt-5 flex flex-wrap gap-2.5">
-            {filterChips.map((chip) => {
-              const isAll = chip === "Tất cả";
-              const isActive = isAll ? !currentType : currentType === chip;
-              const chipHref = isAll ? "/phimbo" : `/phimbo?type=${encodeURIComponent(chip)}`;
-
-              return (
-                <Link
-                  key={chip}
-                  href={chipHref}
-                  className={`rounded-lg px-3 py-2 text-sm transition ${
-                    isActive
-                      ? "bg-pink-500 text-white shadow-lg shadow-pink-500/20"
-                      : "bg-white/8 text-zinc-200 hover:bg-white/10"
-                  }`}
-                >
-                  {chip}
-                </Link>
-              );
-            })}
-          </div>
 
           <section className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
             {phimBoItems.map((item, index) => (
