@@ -28,7 +28,7 @@ export function VideoCard({ item }: VideoCardProps) {
         <img
           src={item.image}
           alt={item.title}
-          className="aspect-[3/4] h-full w-full object-cover transition duration-300 group-hover:scale-105"
+          className="aspect-[2/3] h-full w-full object-cover transition duration-300 group-hover:scale-105"
         />
 
         {/* Views luôn nằm sát mép ảnh */}
@@ -37,22 +37,24 @@ export function VideoCard({ item }: VideoCardProps) {
         </div>
 
         {/* Overlay chỉ hiện khi hover, đè lên views */}
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent p-3 opacity-0 translate-y-2 transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0">
-          <div className="text-[11px] text-zinc-300">
-            <span>{item.views}</span>
+        <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black via-black/40 to-transparent p-4 opacity-0 transition-all duration-300 group-hover:opacity-100">
+          <div className="mb-auto">
+            <h4 className="text-sm font-bold text-white line-clamp-3 leading-snug">
+              {item.title}
+            </h4>
           </div>
 
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-auto flex items-center gap-2">
             <Link
               href={`/detail/${item.id}`}
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-pink-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-pink-400"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-pink-500 px-3 py-2.5 text-xs font-bold text-white transition hover:bg-pink-400"
             >
               ▶ Phát ngay
             </Link>
             <button
               type="button"
               onClick={handleCopyLink}
-              className="rounded-xl bg-white/20 px-3 py-2 text-sm text-white cursor-pointer hover:bg-white/30"
+              className="rounded-xl bg-white/20 px-3 py-2.5 text-xs text-white cursor-pointer hover:bg-white/30"
             >
               ↗
             </button>
@@ -61,7 +63,7 @@ export function VideoCard({ item }: VideoCardProps) {
       </div>
 
       <div className="mt-3 space-y-1">
-        <h3 className="line-clamp-1 font-semibold text-white">{item.title}</h3>
+        <h3 className="line-clamp-1 text-sm font-semibold text-white">{item.title}</h3>
         <p className="line-clamp-1 text-sm text-zinc-400">{item.subtitle}</p>
       </div>
     </article>

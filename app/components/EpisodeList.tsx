@@ -11,6 +11,7 @@ type Episode = {
   description: string;
   duration: string;
   image: string;
+  thumbnailUrl?: string;
 };
 
 type EpisodeListProps = {
@@ -49,7 +50,7 @@ export function EpisodeList({ episodes, itemsPerPage = 20 }: EpisodeListProps) {
           >
             <div className="h-[60px] w-[110px] flex-shrink-0 overflow-hidden rounded-xl md:h-[200px] md:w-[150px]">
               <img
-                src={episode.image}
+                src={episode.thumbnailUrl}
                 alt={episode.title}
                 className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
               />

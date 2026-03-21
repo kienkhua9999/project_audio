@@ -25,7 +25,7 @@ export function VideoSection({ section }: VideoSectionProps) {
   return (
     <section className="mx-auto mt-12 w-full max-w-[120rem] px-5 md:px-8 lg:px-10">
       <div className="mb-5 flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white">{section.title}</h2>
+        <h2 className="text-xl font-bold text-white">{section.title}</h2>
       </div>
 
       <div className="relative">

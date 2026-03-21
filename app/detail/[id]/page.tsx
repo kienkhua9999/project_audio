@@ -75,6 +75,7 @@ export default async function DetailPage({ params }: DetailPageProps) {
     description: series.description, // API response sample shows episodes have no description, so we use series description or a default
     duration: `${ep.duration}:00`,
     image: ep.thumbnailUrl || series.image,
+    thumbnailUrl: ep.thumbnailUrl || series.image,
   }));
 
   if (episodes.length === 0) {
@@ -109,7 +110,7 @@ export default async function DetailPage({ params }: DetailPageProps) {
                 <img
                   src={series.image}
                   alt={series.title}
-                  className="aspect-[4/5] w-full object-cover transition duration-500 hover:scale-105"
+                  className="aspect-[2/3] w-full object-cover transition duration-500 hover:scale-105"
                 />
               </div>
             </div>
@@ -125,13 +126,13 @@ export default async function DetailPage({ params }: DetailPageProps) {
               <div className="flex flex-wrap items-center justify-center gap-8 text-sm md:justify-start md:text-base text-zinc-300">
                 <span>
                   <span className="font-semibold text-white">Lượt xem: </span>
-                  {series.views.toLocaleString()}
+                  {(series.views || 0).toLocaleString()}
                 </span>
               </div>
 
               {/* Chip thể loại, lấy từ subtitle */}
               <div className="flex flex-wrap justify-center gap-3 md:justify-start">
-                {series.tags.map((tag: string) => (
+                {(series.tags || []).map((tag: string) => (
                   <span
                     key={tag}
                     className="rounded-full border border-pink-500/30 bg-pink-500/5 px-4 py-1.5 text-xs md:text-sm font-medium text-pink-300 transition hover:bg-pink-500/10"

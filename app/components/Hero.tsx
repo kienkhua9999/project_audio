@@ -50,7 +50,7 @@ export function Hero({ slides, autoPlayMs = 5500 }: HeroProps) {
             </span>
           ) : null}
 
-          <h1 className="text-3xl font-bold leading-tight text-white md:text-5xl">
+          <h1 className="text-2xl font-bold leading-tight text-white md:text-4xl">
             {activeSlide.title}
           </h1>
           <p className="text-sm text-zinc-200 md:text-base">{activeSlide.subtitle}</p>

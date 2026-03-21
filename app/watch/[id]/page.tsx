@@ -47,7 +47,8 @@ type EpisodeResponse = {
     tags: string[];
     views: number;
     totalEpisodes: number;
-    episodesList: EpisodeSummary[];
+    episodesList?: EpisodeSummary[];
+    episodes?: EpisodeSummary[];
   };
   recommendations: RecommendItem[];
 };
@@ -95,11 +96,12 @@ export default async function WatchPage({ params }: WatchPageProps) {
 
   const { episode, series, recommendations } = data;
 
-  const episodes = (series.episodesList || []).map((ep) => ({
+  const allEpisodes = series.episodesList || series.episodes || [];
+  const episodes = allEpisodes.map((ep) => ({
     id: ep.id,
     episodeNumber: ep.episodeNumber,
     title: `Tập ${ep.episodeNumber} - ${series.title}`,
-    videoUrl: ep.id === episode.id ? episode.videoUrl : "", // Ideally the component handles fetching more or we have links
+    videoUrl: ep.id === episode.id ? episode.videoUrl : "",
   }));
 
   return (
@@ -130,8 +132,8 @@ export default async function WatchPage({ params }: WatchPageProps) {
 
           <WatchPlayer
             title={`${series.title} Tập ${episode.episodeNumber}`}
-            viewsText={`${series.views.toLocaleString()} lượt xem`}
-            tags={series.tags}
+            viewsText={`${(series.views || 0).toLocaleString()} lượt xem`}
+            tags={series.tags || []}
             description={series.description}
             episodes={episodes}
             initialEpisodeId={episode.id}
@@ -152,7 +154,7 @@ export default async function WatchPage({ params }: WatchPageProps) {
                       <img
                         src={item.image}
                         alt={item.title}
-                        className="aspect-[3/4] w-full object-cover transition duration-300 group-hover:scale-110"
+                        className="aspect-[2/3] w-full object-cover transition duration-300 group-hover:scale-110"
                       />
                     </div>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 
 export type WatchEpisode = {
   id: number;
@@ -41,11 +41,19 @@ export function WatchPlayer({
   }, [episodes, activeEpisodeId]);
 
   const totalPages = Math.max(1, Math.ceil(episodes.length / EPISODES_PER_PAGE));
-  const pageForActive = Math.min(
-    totalPages,
-    Math.max(1, Math.ceil(activeEpisodeId / EPISODES_PER_PAGE)),
-  );
-  const [activePage, setActivePage] = useState<number>(pageForActive);
+
+  const currentIndex = useMemo(() => {
+    return episodes.findIndex((e) => e.id === activeEpisodeId);
+  }, [episodes, activeEpisodeId]);
+
+  const episodeIndexForPagination = currentIndex !== -1 ? currentIndex : 0;
+  const pageForActiveDirect = Math.floor(episodeIndexForPagination / EPISODES_PER_PAGE) + 1;
+  const [activePage, setActivePage] = useState<number>(pageForActiveDirect);
+
+  // Sync activePage when active episode changes to ensure we are on the right page
+  useEffect(() => {
+    setActivePage(pageForActiveDirect);
+  }, [pageForActiveDirect]);
 
   const pageEpisodes = useMemo(() => {
     const startIdx = (activePage - 1) * EPISODES_PER_PAGE;
@@ -134,8 +142,8 @@ export function WatchPlayer({
     <section className="flex flex-col gap-6 lg:flex-row lg:items-stretch lg:min-h-[820px]">
       {/* Player bên trái */}
       <div className="min-w-0 flex-1 self-stretch rounded-3xl bg-black/40 p-5 lg:h-full">
-        <div className="mx-auto flex h-full w-full max-w-[420px] flex-col">
-          <div className="group relative overflow-hidden rounded-3xl bg-black">
+        <div className="mx-auto flex h-full w-full max-w-[480px] flex-col">
+          <div className="group relative aspect-[9/16] w-full max-w-full max-h-full mx-auto overflow-hidden rounded-3xl bg-black">
             <video
               ref={videoRef}
               key={activeEpisode?.videoUrl || "no-video"}
@@ -146,7 +154,7 @@ export function WatchPlayer({
               onPause={() => setIsPlaying(false)}
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={handleLoadedMetadata}
-              className="aspect-9/16 w-full rounded-3xl bg-black object-cover"
+              className="h-full w-full rounded-3xl bg-black object-contain"
             />
 
             {/* Overlay to handle play/pause click without conflicting with native controls */}
@@ -368,7 +376,7 @@ export function WatchPlayer({
               </button>
             ))}
             <span className="ml-auto text-zinc-400">
-              Tập {activeEpisodeId}/{episodes.length}
+              Tập {activeEpisode?.episodeNumber ?? 1}/{episodes.length}
             </span>
           </div>
         ) : null}
