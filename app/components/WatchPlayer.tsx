@@ -221,7 +221,6 @@ export function WatchPlayer({
           >
             <video
               ref={videoRef}
-              src={activeEpisode?.videoUrl && !activeEpisode.videoUrl.toLowerCase().includes(".m3u8") ? activeEpisode.videoUrl : undefined}
               playsInline
               preload="auto"
               crossOrigin="anonymous"
@@ -230,7 +229,14 @@ export function WatchPlayer({
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={handleLoadedMetadata}
               className="h-full w-full rounded-3xl bg-black object-contain"
-            />
+            >
+              {activeEpisode?.videoUrl && !activeEpisode.videoUrl.toLowerCase().includes(".m3u8") && (
+                <source 
+                  src={encodeURI(decodeURIComponent(activeEpisode.videoUrl))} 
+                  type="video/mp4" 
+                />
+              )}
+            </video>
 
             {/* Overlay to handle play/pause click without conflicting with native controls */}
             <div 
