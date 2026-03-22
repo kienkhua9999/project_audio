@@ -50,7 +50,7 @@ export function WatchPlayer({
   const pageForActiveDirect = Math.floor(episodeIndexForPagination / EPISODES_PER_PAGE) + 1;
   const [activePage, setActivePage] = useState<number>(pageForActiveDirect);
 
-  // Sync activePage when active episode changes to ensure we are on the right page
+  // Sync activePage when active episode changes
   useEffect(() => {
     setActivePage(pageForActiveDirect);
   }, [pageForActiveDirect]);
@@ -72,10 +72,13 @@ export function WatchPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [showControls, setShowControls] = useState(true);
+  
   const videoRef = useRef<HTMLVideoElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hlsRef = useRef<any>(null); // Lưu trữ instance Hls để dọn dẹp
 
-  // Auto-hide controls after a delay
+  // Tự động ẩn controls
   useEffect(() => {
     if (isPlaying && showControls) {
       if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
@@ -88,25 +91,31 @@ export function WatchPlayer({
     };
   }, [isPlaying, showControls]);
 
-  // HLS/Native Switching
+  // Khởi tạo Video và HLS
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !activeEpisode?.videoUrl) return;
 
+    // Dọn dẹp Hls instance cũ nếu có
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+      hlsRef.current = null;
+    }
+
     const isHls = activeEpisode.videoUrl.toLowerCase().includes(".m3u8");
+    const formattedUrl = encodeURI(decodeURIComponent(activeEpisode.videoUrl));
 
     if (isHls) {
-      // Use dynamic import for HLS.js to avoid SSR issues
       const loadHls = async () => {
         if (typeof window !== "undefined") {
           const Hls = (window as any).Hls;
           if (Hls) {
-            initHls(Hls, video, activeEpisode.videoUrl);
+            initHls(Hls, video, formattedUrl);
           } else {
             const script = document.createElement("script");
             script.src = "https://cdn.jsdelivr.net/npm/hls.js@latest";
             script.onload = () => {
-              initHls((window as any).Hls, video, activeEpisode.videoUrl);
+              initHls((window as any).Hls, video, formattedUrl);
             };
             document.head.appendChild(script);
           }
@@ -116,6 +125,7 @@ export function WatchPlayer({
       const initHls = (Hls: any, v: HTMLVideoElement, url: string) => {
         if (Hls.isSupported()) {
           const hls = new Hls();
+          hlsRef.current = hls; // Lưu vào ref
           hls.loadSource(url);
           hls.attachMedia(v);
         } else if (v.canPlayType("application/vnd.apple.mpegurl")) {
@@ -126,18 +136,19 @@ export function WatchPlayer({
 
       loadHls();
     } else {
-      // For MP4, we just ensure it's loaded. Recalling load() on src change
+      // Dành cho mp4, set src thẳng vào thẻ thay vì thẻ con <source>
+      video.src = formattedUrl;
       video.load();
     }
-  }, [activeEpisode?.videoUrl]);
 
-  // Effect to call video.load() when the active episode changes
-  useEffect(() => {
-    const video = videoRef.current;
-    if (video) {
-      video.load();
-    }
-  }, [activeEpisode?.id]); // Trigger when episode ID changes
+    // Dọn dẹp memory khi component unmount
+    return () => {
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+    };
+  }, [activeEpisode?.videoUrl]);
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -190,20 +201,41 @@ export function WatchPlayer({
     setShowControls(true);
   };
 
+  // FULLSCREEN HOÀN CHỈNH (Hỗ trợ trình duyệt và cực chuẩn cho iPhone Safari)
   const toggleFullscreen = () => {
-    if (videoRef.current) {
-      if (!document.fullscreenElement) {
-        videoRef.current.parentElement?.requestFullscreen();
-      } else {
+    if (!videoRef.current && !wrapperRef.current) return;
+    
+    const wrapper = wrapperRef.current;
+    
+    if (!document.fullscreenElement) {
+      // Mở fullscreen
+      if (wrapper?.requestFullscreen) {
+        wrapper.requestFullscreen();
+      } else if ((wrapper as any).webkitRequestFullscreen) {
+        (wrapper as any).webkitRequestFullscreen(); // Safari
+      } else if ((videoRef.current as any).webkitEnterFullscreen) {
+        (videoRef.current as any).webkitEnterFullscreen(); // iPhone iOS
+      }
+    } else {
+      // Thoát fullscreen
+      if (document.exitFullscreen) {
         document.exitFullscreen();
+      } else if ((document as any).webkitExitFullscreen) {
+        (document as any).webkitExitFullscreen();
       }
     }
     setShowControls(true);
   };
 
+  // Hỗ trợ hiển thị Giờ : Phút : Giây nếu video trên 60 phút
   const formatTime = (time: number) => {
-    const mins = Math.floor(time / 60);
+    if (!time || isNaN(time)) return "0:00";
+    const hours = Math.floor(time / 3600);
+    const mins = Math.floor((time % 3600) / 60);
     const secs = Math.floor(time % 60);
+    if (hours > 0) {
+      return `${hours}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    }
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
@@ -217,8 +249,10 @@ export function WatchPlayer({
       <div className="min-w-0 flex-1 self-stretch rounded-3xl bg-black/40 p-5 lg:h-full">
         <div className="mx-auto flex h-full w-full max-w-[480px] flex-col">
           <div 
+            ref={wrapperRef}
             className="group relative aspect-[9/16] w-full max-w-full max-h-full mx-auto overflow-hidden rounded-3xl bg-black"
           >
+            {/* THẺ VIDEO: Bỏ thẻ <source> - gán thẳng src bằng logic useEffect ở trên */}
             <video
               ref={videoRef}
               playsInline
@@ -229,18 +263,11 @@ export function WatchPlayer({
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={handleLoadedMetadata}
               className="h-full w-full rounded-3xl bg-black object-contain"
-            >
-              {activeEpisode?.videoUrl && !activeEpisode.videoUrl.toLowerCase().includes(".m3u8") && (
-                <source 
-                  src={encodeURI(decodeURIComponent(activeEpisode.videoUrl))} 
-                  type="video/mp4" 
-                />
-              )}
-            </video>
+            ></video>
 
             {/* Overlay to handle play/pause click without conflicting with native controls */}
             <div 
-              className={`absolute inset-0 z-10 cursor-pointer ${showControls ? "bg-black/20" : "bg-transparent"}`} 
+              className={`absolute inset-0 z-10 cursor-pointer transition-colors duration-300 ${!isPlaying ? "bg-black/40" : (showControls ? "bg-black/20" : "bg-transparent")}`} 
               onClick={(e) => {
                 if (e.target === e.currentTarget) {
                   if (showControls) {
@@ -253,7 +280,7 @@ export function WatchPlayer({
             />
 
             {/* Custom Bottom Control Bar */}
-            <div className={`absolute inset-x-0 bottom-0 z-30 flex flex-col gap-2 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-4 transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0"}`}>
+            <div className={`absolute inset-x-0 bottom-0 z-30 flex flex-col gap-2 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-4 transition-opacity duration-300 ${showControls || !isPlaying ? "opacity-100" : "opacity-0"}`}>
               {/* Progress Bar */}
               <input
                 type="range"
@@ -336,27 +363,25 @@ export function WatchPlayer({
             </div>
 
             {/* Central Play/Pause Toggle - Visible when paused or at the start */}
-            <div className={`absolute left-1/2 top-1/2 z-20 flex -translate-x-1/2 -translate-y-1/2 items-center transition-opacity duration-300 ${(!isPlaying || showControls) ? "opacity-100" : "opacity-0"}`}>
-              {!isPlaying && (
-                <button
-                  type="button"
+            <div className={`pointer-events-none absolute left-1/2 top-1/2 z-20 flex -translate-x-1/2 -translate-y-1/2 items-center transition-opacity duration-300 ${!isPlaying ? "opacity-100 scale-100" : "opacity-0 scale-110"}`}>
+               <div
+                  className="flex h-20 w-20 items-center justify-center rounded-full bg-pink-500/80 text-white shadow-2xl backdrop-blur-sm transition cursor-pointer pointer-events-auto hover:scale-110 hover:bg-pink-500"
                   onClick={(e) => {
                     e.stopPropagation();
                     togglePlay();
                   }}
-                  className="flex h-20 w-20 items-center justify-center rounded-full bg-pink-500/80 text-white shadow-2xl backdrop-blur-sm transition hover:scale-110 hover:bg-pink-500 cursor-pointer"
-                  aria-label="Phát video"
+                  aria-label="Phát video/Tạm dừng"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="ml-1 h-10 w-10"
-                  >
-                    <path fillRule="evenodd" d="M4.5 5.653c0-1.427 1.522-2.333 2.727-1.617l12.18 7.32c1.18.706 1.18 2.405 0 3.111l-12.18 7.32c-1.205.716-2.727-.19-2.727-1.617V5.653Z" clipRule="evenodd" />
-                  </svg>
-                </button>
-              )}
+                  {isPlaying ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-10 w-10">
+                       <path fillRule="evenodd" d="M6.75 5.25a.75.75 0 0 1 .75.75v12a.75.75 0 0 1-1.5 0v-12a.75.75 0 0 1 .75-.75Zm9 0a.75.75 0 0 1 .75.75v12a.75.75 0 0 1-1.5 0v-12a.75.75 0 0 1 .75-.75Z" clipRule="evenodd" />
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="ml-1 h-10 w-10">
+                      <path fillRule="evenodd" d="M4.5 5.653c0-1.427 1.522-2.333 2.727-1.617l12.18 7.32c1.18.706 1.18 2.405 0 3.111l-12.18 7.32c-1.205.716-2.727-.19-2.727-1.617V5.653Z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                </div>
             </div>
 
             <button
@@ -434,7 +459,7 @@ export function WatchPlayer({
           </span>
           <span className="inline-flex items-center gap-2">
             <span className="opacity-80">💬</span>
-            {viewsText}
+            {viewsText} // Chỉnh sửa lại số lượng comment nếu có
           </span>
         </div>
 
@@ -479,7 +504,7 @@ export function WatchPlayer({
         ) : null}
 
         {/* Grid episode picker */}
-        <div className="mt-4 grid grid-cols-5 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-6">
+        <div className="mt-4 grid grid-cols-5 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-6 mb-4">
           {pageEpisodes.map((e) => (
             <button
               key={e.id}
@@ -500,4 +525,3 @@ export function WatchPlayer({
     </section>
   );
 }
-
