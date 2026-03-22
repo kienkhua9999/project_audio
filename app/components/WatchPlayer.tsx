@@ -88,7 +88,7 @@ export function WatchPlayer({
     };
   }, [isPlaying, showControls]);
 
-  // HLS Support
+  // HLS/Native Switching
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !activeEpisode?.videoUrl) return;
@@ -126,11 +126,18 @@ export function WatchPlayer({
 
       loadHls();
     } else {
-      // For MP4, we set src and call load()
-      video.src = activeEpisode.videoUrl;
+      // For MP4, we just ensure it's loaded. Recalling load() on src change
       video.load();
     }
   }, [activeEpisode?.videoUrl]);
+
+  // Effect to call video.load() when the active episode changes
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.load();
+    }
+  }, [activeEpisode?.id]); // Trigger when episode ID changes
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -211,14 +218,14 @@ export function WatchPlayer({
         <div className="mx-auto flex h-full w-full max-w-[480px] flex-col">
           <div 
             className="group relative aspect-[9/16] w-full max-w-full max-h-full mx-auto overflow-hidden rounded-3xl bg-black"
-            onClick={() => setShowControls(!showControls)}
           >
             <video
               ref={videoRef}
               key={activeEpisode?.id || "no-video"}
               src={activeEpisode?.videoUrl && !activeEpisode.videoUrl.toLowerCase().includes(".m3u8") ? activeEpisode.videoUrl : undefined}
               playsInline
-              preload="metadata"
+              preload="auto"
+              crossOrigin="anonymous"
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
               onTimeUpdate={handleTimeUpdate}
