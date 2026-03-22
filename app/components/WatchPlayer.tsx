@@ -221,7 +221,6 @@ export function WatchPlayer({
           >
             <video
               ref={videoRef}
-              key={activeEpisode?.id || "no-video"}
               src={activeEpisode?.videoUrl && !activeEpisode.videoUrl.toLowerCase().includes(".m3u8") ? activeEpisode.videoUrl : undefined}
               playsInline
               preload="auto"
