@@ -222,7 +222,6 @@ export function WatchPlayer({
             <video
               ref={videoRef}
               playsInline
-              controls
               preload="auto"
               crossOrigin="anonymous"
               onPlay={() => setIsPlaying(true)}
