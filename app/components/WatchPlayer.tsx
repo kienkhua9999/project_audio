@@ -99,7 +99,6 @@ export function WatchPlayer({
       // Use dynamic import for HLS.js to avoid SSR issues
       const loadHls = async () => {
         if (typeof window !== "undefined") {
-          // Check if HLS is already loaded or we need to add script
           const Hls = (window as any).Hls;
           if (Hls) {
             initHls(Hls, video, activeEpisode.videoUrl);
@@ -121,12 +120,15 @@ export function WatchPlayer({
           hls.attachMedia(v);
         } else if (v.canPlayType("application/vnd.apple.mpegurl")) {
           v.src = url;
+          v.load();
         }
       };
 
       loadHls();
     } else {
+      // For MP4, we set src and call load()
       video.src = activeEpisode.videoUrl;
+      video.load();
     }
   }, [activeEpisode?.videoUrl]);
 
@@ -214,13 +216,14 @@ export function WatchPlayer({
             <video
               ref={videoRef}
               key={activeEpisode?.id || "no-video"}
+              src={activeEpisode?.videoUrl && !activeEpisode.videoUrl.toLowerCase().includes(".m3u8") ? activeEpisode.videoUrl : undefined}
               playsInline
               preload="metadata"
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={handleLoadedMetadata}
-              className="h-full w-full rounded-3xl bg-black object-contain pointer-events-none"
+              className="h-full w-full rounded-3xl bg-black object-contain"
             />
 
             {/* Overlay to handle play/pause click without conflicting with native controls */}
