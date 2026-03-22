@@ -143,7 +143,7 @@ export default async function WatchPage({ params }: WatchPageProps) {
           <section className="mt-12">
             <h2 className="text-2xl font-bold text-white">Đề xuất cho bạn</h2>
 
-            <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+            <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
               {recommendations.map((item) => (
                 <article
                   key={`recommend-${item.id}`}
@@ -154,7 +154,7 @@ export default async function WatchPage({ params }: WatchPageProps) {
                       <img
                         src={item.image}
                         alt={item.title}
-                        className="aspect-[2/3] w-full object-cover transition duration-300 group-hover:scale-110"
+                        className="aspect-[16/9] w-full object-cover transition duration-300 group-hover:scale-110"
                       />
                     </div>
 
@@ -162,9 +162,10 @@ export default async function WatchPage({ params }: WatchPageProps) {
                       <h3 className="line-clamp-2 text-sm font-semibold text-white group-hover:text-pink-300 transition">
                         {item.title}
                       </h3>
-                      <p className="line-clamp-1 text-xs text-zinc-400">
-                        {item.tags?.[0] || "Đang cập nhật"}
-                      </p>
+                      <div className="flex items-center justify-between text-[11px] text-zinc-400">
+                        <span className="line-clamp-1 flex-1">{item.tags?.[0] || "Đang cập nhật"}</span>
+                        <span className="ml-2 whitespace-nowrap">{(item.views || 0).toLocaleString()} views</span>
+                      </div>
                     </div>
                   </Link>
                 </article>

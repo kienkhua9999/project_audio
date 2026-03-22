@@ -62,6 +62,11 @@ export default async function DetailPage({ params }: DetailPageProps) {
   let series: SeriesDetail;
   try {
     series = await fetchJson<SeriesDetail>(`${baseUrl}/series/${idParam}`);
+    
+    // Update view count in background
+    fetch(`${baseUrl}/series/${idParam}/view`, { method: "PATCH" }).catch(err => 
+      console.error("Failed to update view count:", err)
+    );
   } catch (error) {
     console.error("Error fetching series detail:", error);
     redirect(referer);
@@ -97,7 +102,9 @@ export default async function DetailPage({ params }: DetailPageProps) {
             </Link>
             <span className="mx-1.5 text-zinc-500">{">"}</span>
             <span className="hover:text-white cursor-pointer text-zinc-300 transition">
-              Phim hấp dẫn
+              <Link href="/phimbo" className="hover:text-zinc-300 transition-colors">
+                Phim bộ
+              </Link>
             </span>
             <span className="mx-1.5 text-zinc-500">{">"}</span>
             <span className="text-white">{series.title}</span>
@@ -105,12 +112,12 @@ export default async function DetailPage({ params }: DetailPageProps) {
 
           {/* Phần poster + Info giới thiệu */}
           <section className="flex flex-col items-center gap-y-8 md:flex-row md:items-start">
-            <div className="w-full max-w-[260px] flex-shrink-0 md:w-[260px] lg:max-w-[300px]">
+            <div className="w-full max-w-[450px] flex-shrink-0 md:w-[450px]">
               <div className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 shadow-2xl">
                 <img
                   src={series.image}
                   alt={series.title}
-                  className="aspect-[2/3] w-full object-cover transition duration-500 hover:scale-105"
+                  className="aspect-[16/9] w-full object-cover transition duration-500 hover:scale-105"
                 />
               </div>
             </div>
@@ -118,7 +125,7 @@ export default async function DetailPage({ params }: DetailPageProps) {
             {/* Khối thông tin bên phải ảnh, bố cục giống Netshort */}
             <div className="mt-6 flex flex-1 flex-col items-center gap-5 text-center md:mt-0 md:items-start md:pl-10 md:text-left">
               {/* Tiêu đề lớn */}
-              <h1 className="text-3xl font-bold md:text-4xl lg:text-5xl">
+              <h1 className="text-3xl font-bold md:text-2xl lg:text-3xl">
                 {series.title}
               </h1>
 

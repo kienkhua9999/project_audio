@@ -71,7 +71,7 @@ export default async function PhimBoPage({ searchParams }: PhimBoPageProps) {
   const currentType = resolvedSearchParams?.type || "";
 
 
-  const limit = 18;
+  const limit = 12;
   let phimBoItems: SeriesItem[] = [];
   let totalPages = 1;
 
@@ -105,27 +105,30 @@ export default async function PhimBoPage({ searchParams }: PhimBoPageProps) {
         <SidebarAd />
 
         <main className="w-full max-w-[1300px] px-4 py-8 md:px-8 lg:px-10">
-          <p className="text-xs text-zinc-500">Trang chủ &gt; Phim bộ</p>
+          <p className="text-xs text-zinc-500">
+            <Link href="/" className="hover:text-zinc-300 transition-colors">Trang chủ</Link> &gt; Phim bộ
+          </p>
 
           <h1 className="mt-5 text-3xl font-bold tracking-tight md:text-4xl">Tất cả các phim</h1>
 
-          <section className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+          <section className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
             {phimBoItems.map((item, index) => (
               <Link key={`${item.id}-${index}`} href={`/detail/${item.id}`} className="group">
-                <div className="overflow-hidden rounded-xl bg-white/5">
+                <div className="overflow-hidden rounded-xl bg-white/5 border border-white/10">
                   <img
                     src={item.image}
                     alt={item.title}
-                    className="aspect-3/4 w-full object-cover transition duration-300 group-hover:scale-105"
+                    className="aspect-[16/9] w-full object-cover transition duration-300 group-hover:scale-105"
                     loading="lazy"
                   />
                 </div>
                 <h3 className="mt-2 line-clamp-2 text-sm font-semibold text-zinc-100 group-hover:text-pink-300">
                   {item.title}
                 </h3>
-                <p className="mt-1 line-clamp-1 text-xs text-zinc-400">
-                  {item.tags || item.description}
-                </p>
+                <div className="mt-1 flex items-center justify-between text-[11px] text-zinc-400">
+                  <span className="line-clamp-1 flex-1">{item.tags || item.description}</span>
+                  <span className="ml-2 whitespace-nowrap">{(item.views || 0).toLocaleString()} lượt xem</span>
+                </div>
               </Link>
             ))}
           </section>

@@ -71,16 +71,76 @@ export function WatchPlayer({
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [showControls, setShowControls] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Auto-hide controls after a delay
+  useEffect(() => {
+    if (isPlaying && showControls) {
+      if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+      controlsTimeoutRef.current = setTimeout(() => {
+        setShowControls(false);
+      }, 3000);
+    }
+    return () => {
+      if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+    };
+  }, [isPlaying, showControls]);
+
+  // HLS Support
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !activeEpisode?.videoUrl) return;
+
+    const isHls = activeEpisode.videoUrl.toLowerCase().includes(".m3u8");
+
+    if (isHls) {
+      // Use dynamic import for HLS.js to avoid SSR issues
+      const loadHls = async () => {
+        if (typeof window !== "undefined") {
+          // Check if HLS is already loaded or we need to add script
+          const Hls = (window as any).Hls;
+          if (Hls) {
+            initHls(Hls, video, activeEpisode.videoUrl);
+          } else {
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/npm/hls.js@latest";
+            script.onload = () => {
+              initHls((window as any).Hls, video, activeEpisode.videoUrl);
+            };
+            document.head.appendChild(script);
+          }
+        }
+      };
+
+      const initHls = (Hls: any, v: HTMLVideoElement, url: string) => {
+        if (Hls.isSupported()) {
+          const hls = new Hls();
+          hls.loadSource(url);
+          hls.attachMedia(v);
+        } else if (v.canPlayType("application/vnd.apple.mpegurl")) {
+          v.src = url;
+        }
+      };
+
+      loadHls();
+    } else {
+      video.src = activeEpisode.videoUrl;
+    }
+  }, [activeEpisode?.videoUrl]);
 
   const togglePlay = () => {
     if (videoRef.current) {
       if (videoRef.current.paused) {
-        videoRef.current.play();
+        videoRef.current.play().catch(e => {
+          console.error("Play error:", e);
+        });
       } else {
         videoRef.current.pause();
       }
     }
+    setShowControls(true);
   };
 
   const skipForward = () => {
@@ -90,12 +150,14 @@ export function WatchPlayer({
         videoRef.current.duration
       );
     }
+    setShowControls(true);
   };
 
   const skipBackward = () => {
     if (videoRef.current) {
       videoRef.current.currentTime = Math.max(videoRef.current.currentTime - 5, 0);
     }
+    setShowControls(true);
   };
 
   const handleTimeUpdate = () => {
@@ -116,6 +178,7 @@ export function WatchPlayer({
       videoRef.current.currentTime = time;
       setCurrentTime(time);
     }
+    setShowControls(true);
   };
 
   const toggleFullscreen = () => {
@@ -126,6 +189,7 @@ export function WatchPlayer({
         document.exitFullscreen();
       }
     }
+    setShowControls(true);
   };
 
   const formatTime = (time: number) => {
@@ -143,32 +207,38 @@ export function WatchPlayer({
       {/* Player bên trái */}
       <div className="min-w-0 flex-1 self-stretch rounded-3xl bg-black/40 p-5 lg:h-full">
         <div className="mx-auto flex h-full w-full max-w-[480px] flex-col">
-          <div className="group relative aspect-[9/16] w-full max-w-full max-h-full mx-auto overflow-hidden rounded-3xl bg-black">
+          <div 
+            className="group relative aspect-[9/16] w-full max-w-full max-h-full mx-auto overflow-hidden rounded-3xl bg-black"
+            onClick={() => setShowControls(!showControls)}
+          >
             <video
               ref={videoRef}
-              key={activeEpisode?.videoUrl || "no-video"}
-              src={activeEpisode?.videoUrl || undefined}
+              key={activeEpisode?.id || "no-video"}
               playsInline
               preload="metadata"
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={handleLoadedMetadata}
-              className="h-full w-full rounded-3xl bg-black object-contain"
+              className="h-full w-full rounded-3xl bg-black object-contain pointer-events-none"
             />
 
             {/* Overlay to handle play/pause click without conflicting with native controls */}
             <div 
-              className="absolute inset-0 z-10 cursor-pointer" 
+              className={`absolute inset-0 z-10 cursor-pointer ${showControls ? "bg-black/20" : "bg-transparent"}`} 
               onClick={(e) => {
                 if (e.target === e.currentTarget) {
-                  togglePlay();
+                  if (showControls) {
+                    togglePlay();
+                  } else {
+                    setShowControls(true);
+                  }
                 }
               }}
             />
 
             {/* Custom Bottom Control Bar */}
-            <div className="absolute inset-x-0 bottom-0 z-30 flex flex-col gap-2 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <div className={`absolute inset-x-0 bottom-0 z-30 flex flex-col gap-2 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-4 transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0"}`}>
               {/* Progress Bar */}
               <input
                 type="range"
@@ -184,7 +254,10 @@ export function WatchPlayer({
                 <div className="flex items-center gap-4">
                   <button
                     type="button"
-                    onClick={togglePlay}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      togglePlay();
+                    }}
                     className="text-white transition hover:text-pink-400 cursor-pointer"
                   >
                     {isPlaying ? (
@@ -201,7 +274,10 @@ export function WatchPlayer({
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={skipBackward}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        skipBackward();
+                      }}
                       className="text-white hover:text-pink-400 cursor-pointer"
                       title="Lùi 5s"
                     >
@@ -211,7 +287,10 @@ export function WatchPlayer({
                     </button>
                     <button
                       type="button"
-                      onClick={skipForward}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        skipForward();
+                      }}
                       className="text-white hover:text-pink-400 cursor-pointer"
                       title="Tiến 5s"
                     >
@@ -228,7 +307,10 @@ export function WatchPlayer({
 
                 <button
                   type="button"
-                  onClick={toggleFullscreen}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleFullscreen();
+                  }}
                   className="text-white hover:text-pink-400 cursor-pointer"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-5 w-5">
@@ -238,9 +320,9 @@ export function WatchPlayer({
               </div>
             </div>
 
-            {/* Central Play/Pause Toggle - Only show Play button at the very beginning */}
-            <div className="absolute left-1/2 top-1/2 z-20 flex -translate-x-1/2 -translate-y-1/2 items-center">
-              {!isPlaying && currentTime === 0 && (
+            {/* Central Play/Pause Toggle - Visible when paused or at the start */}
+            <div className={`absolute left-1/2 top-1/2 z-20 flex -translate-x-1/2 -translate-y-1/2 items-center transition-opacity duration-300 ${(!isPlaying || showControls) ? "opacity-100" : "opacity-0"}`}>
+              {!isPlaying && (
                 <button
                   type="button"
                   onClick={(e) => {

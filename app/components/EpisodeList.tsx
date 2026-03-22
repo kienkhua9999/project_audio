@@ -48,7 +48,7 @@ export function EpisodeList({ episodes, itemsPerPage = 20 }: EpisodeListProps) {
             href={`/watch/${episode.id}`}
             className="flex items-start gap-4 rounded-2xl bg-white/5 p-3 text-xs text-zinc-200 md:p-3.5 transition hover:bg-white/10 group cursor-pointer"
           >
-            <div className="h-[60px] w-[110px] flex-shrink-0 overflow-hidden rounded-xl md:h-[200px] md:w-[150px]">
+            <div className="relative aspect-video w-[100px] md:w-[180px] flex-shrink-0 overflow-hidden rounded-xl">
               <img
                 src={episode.thumbnailUrl}
                 alt={episode.title}
@@ -58,16 +58,10 @@ export function EpisodeList({ episodes, itemsPerPage = 20 }: EpisodeListProps) {
 
             <div className="flex-1 space-y-1">
               <div className="flex flex-wrap items-center justify-between gap-1 md:gap-2">
-                <h3 className="text-base font-semibold text-white md:text-[24px] group-hover:text-pink-400 transition">
+                <h3 className="text-base font-semibold text-white md:text-[16px] group-hover:text-pink-400 transition">
                   {episode.title}
                 </h3>
-                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-zinc-200 md:px-3 md:text-[14px]">
-                  {episode.duration}
-                </span>
               </div>
-              <p className="hidden text-[14px] leading-relaxed text-zinc-300 md:block md:text-[16px] line-clamp-2">
-                {episode.description}
-              </p>
             </div>
           </Link>
         ))}

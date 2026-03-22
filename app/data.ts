@@ -21,6 +21,7 @@ export type HeroSlide = {
   cta: string;
   background: string;
   tag?: string;
+  views?: number;
 };
 
 export const heroSlides: HeroSlide[] = [

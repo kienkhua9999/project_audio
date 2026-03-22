@@ -13,6 +13,7 @@ type SliderApiItem = {
   image: string;
   tags: string;
   isExclusive: boolean;
+  views: number;
 };
 
 type SectionApiItem = {
@@ -51,6 +52,7 @@ function mapSliderItem(item: SliderApiItem): HeroSlide {
     cta: "Phát ngay",
     background: item.image,
     tag: item.isExclusive ? "ĐỘC QUYỀN" : "HOT",
+    views: item.views,
   };
 }
 

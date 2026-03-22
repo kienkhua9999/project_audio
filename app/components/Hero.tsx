@@ -53,7 +53,13 @@ export function Hero({ slides, autoPlayMs = 5500 }: HeroProps) {
           <h1 className="text-2xl font-bold leading-tight text-white md:text-4xl">
             {activeSlide.title}
           </h1>
-          <p className="text-sm text-zinc-200 md:text-base">{activeSlide.subtitle}</p>
+          <div className="flex items-center gap-3 text-sm text-zinc-200 md:text-base">
+            {activeSlide.views !== undefined && (
+              <>
+                <p>{activeSlide.views.toLocaleString()} lượt xem</p>
+              </>
+            )}
+          </div>
 
           <Link
             href={`/detail/${activeSlide.id}`}

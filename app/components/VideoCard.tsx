@@ -23,12 +23,12 @@ export function VideoCard({ item }: VideoCardProps) {
     }
   }, [item.id]);
   return (
-    <article className="group w-full md:max-w-[260px]">
+    <article className="group w-full">
       <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-zinc-900">
         <img
           src={item.image}
           alt={item.title}
-          className="aspect-[2/3] h-full w-full object-cover transition duration-300 group-hover:scale-105"
+          className="aspect-[16/9] h-full w-full object-cover transition duration-300 group-hover:scale-105"
         />
 
         {/* Views luôn nằm sát mép ảnh */}
@@ -64,7 +64,10 @@ export function VideoCard({ item }: VideoCardProps) {
 
       <div className="mt-3 space-y-1">
         <h3 className="line-clamp-1 text-sm font-semibold text-white">{item.title}</h3>
-        <p className="line-clamp-1 text-sm text-zinc-400">{item.subtitle}</p>
+        <div className="flex items-center justify-between text-xs text-zinc-400">
+          <span className="line-clamp-1 flex-1">{item.subtitle}</span>
+          <span className="ml-2 whitespace-nowrap">{item.views}</span>
+        </div>
       </div>
     </article>
   );
