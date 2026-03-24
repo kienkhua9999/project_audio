@@ -46,7 +46,7 @@ export default function TinTucList({ newsItems }: NewsItemProps) {
                   loading="lazy"
                 />
                 {item.tags && item.tags.length > 0 && (
-                  <span className="absolute left-3 top-3 rounded-full bg-fuchsia-500 px-2.5 py-1 text-[10px] font-semibold text-white">
+                  <span className="absolute left-3 top-3 rounded-full bg-pink-500 px-2.5 py-1 text-[10px] font-semibold text-white">
                     {item.tags[0]}
                   </span>
                 )}
@@ -57,7 +57,7 @@ export default function TinTucList({ newsItems }: NewsItemProps) {
                   {item.views.toLocaleString()} lượt xem
                 </p>
 
-                <h2 className="mt-2 line-clamp-2 text-[20px] font-semibold leading-tight text-zinc-100 transition-colors group-hover:text-fuchsia-400">
+                <h2 className="mt-2 line-clamp-2 text-[20px] font-semibold leading-tight text-zinc-100 transition-colors group-hover:text-pink-400">
                   {item.title}
                 </h2>
 
@@ -98,7 +98,7 @@ export default function TinTucList({ newsItems }: NewsItemProps) {
             <div className="p-6 md:p-8">
               <div className="flex items-center gap-2 mb-3">
                 {selectedItem.tags.map(tag => (
-                  <span key={tag} className="rounded-full bg-fuchsia-500/10 px-2 py-0.5 text-[10px] font-semibold text-fuchsia-400 border border-fuchsia-500/20">
+                  <span key={tag} className="rounded-full bg-pink-500/10 px-2 py-0.5 text-[10px] font-semibold text-pink-400 border border-pink-500/20">
                     {tag}
                   </span>
                 ))}
@@ -108,7 +108,7 @@ export default function TinTucList({ newsItems }: NewsItemProps) {
               {/* Title links to Movie Detail as requested */}
               <Link
                 href={`/detail/${selectedItem.id}`}
-                className="block text-2xl font-bold text-white hover:text-fuchsia-400 transition-colors md:text-3xl"
+                className="block text-2xl font-bold text-white hover:text-pink-400 transition-colors md:text-3xl"
               >
                 {selectedItem.title}
               </Link>
@@ -128,7 +128,7 @@ export default function TinTucList({ newsItems }: NewsItemProps) {
                 </button>
                 <Link
                   href={`/detail/${selectedItem.id}`}
-                  className="rounded-xl bg-fuchsia-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-fuchsia-500/20 transition hover:bg-fuchsia-400 hover:scale-[1.02] active:scale-[0.98]"
+                  className="rounded-xl bg-pink-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-pink-500/20 transition hover:bg-pink-400 hover:scale-[1.02] active:scale-[0.98]"
                 >
                   Xem phim ngay
                 </Link>

@@ -31,6 +31,7 @@ type PhimBoPageProps = {
   searchParams?: Promise<{
     page?: string;
     type?: string;
+    search?: string;
   }>;
 };
 
@@ -69,7 +70,7 @@ export default async function PhimBoPage({ searchParams }: PhimBoPageProps) {
   const resolvedSearchParams = await searchParams;
   const currentPage = Math.max(1, Number(resolvedSearchParams?.page ?? 1));
   const currentType = resolvedSearchParams?.type || "";
-
+  const currentSearch = resolvedSearchParams?.search || "";
 
   const limit = 12;
   let phimBoItems: SeriesItem[] = [];
@@ -77,8 +78,9 @@ export default async function PhimBoPage({ searchParams }: PhimBoPageProps) {
 
   try {
     const typeParam = currentType ? `&type=${encodeURIComponent(currentType)}` : "";
+    const searchParam = currentSearch ? `&search=${encodeURIComponent(currentSearch)}` : "";
     // Thêm tham số limit và type vào API call theo yêu cầu
-    const data = await fetchJson<SeriesResponse>(`${baseUrl}/series?page=${currentPage}&limit=${limit}${typeParam}`);
+    const data = await fetchJson<SeriesResponse>(`${baseUrl}/series?page=${currentPage}&limit=${limit}${typeParam}${searchParam}`);
     
     phimBoItems = data.items ?? [];
     
@@ -109,7 +111,9 @@ export default async function PhimBoPage({ searchParams }: PhimBoPageProps) {
             <Link href="/" className="hover:text-zinc-300 transition-colors">Trang chủ</Link> &gt; Phim bộ
           </p>
 
-          <h1 className="mt-5 text-3xl font-bold tracking-tight md:text-4xl">Tất cả các phim</h1>
+          <h1 className="mt-5 text-3xl font-bold tracking-tight md:text-4xl">
+            {currentSearch ? `Kết quả tìm kiếm cho: "${currentSearch}"` : "Tất cả các phim"}
+          </h1>
 
           <section className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
             {phimBoItems.map((item, index) => (
@@ -135,7 +139,7 @@ export default async function PhimBoPage({ searchParams }: PhimBoPageProps) {
 
           <div className="mt-10 flex items-center justify-center gap-2 text-sm text-zinc-300">
             <Link
-              href={`/phimbo?page=${Math.max(1, currentPage - 1)}${currentType ? `&type=${encodeURIComponent(currentType)}` : ""}`}
+              href={`/phimbo?page=${Math.max(1, currentPage - 1)}${currentType ? `&type=${encodeURIComponent(currentType)}` : ""}${currentSearch ? `&search=${encodeURIComponent(currentSearch)}` : ""}`}
               className={`flex h-8 w-8 items-center justify-center rounded-full border border-white/10 transition ${
                 currentPage === 1
                   ? "pointer-events-none text-zinc-600"
@@ -163,7 +167,7 @@ export default async function PhimBoPage({ searchParams }: PhimBoPageProps) {
               ) : (
                 <Link
                   key={page}
-                  href={`/phimbo?page=${page}${currentType ? `&type=${encodeURIComponent(currentType)}` : ""}`}
+                  href={`/phimbo?page=${page}${currentType ? `&type=${encodeURIComponent(currentType)}` : ""}${currentSearch ? `&search=${encodeURIComponent(currentSearch)}` : ""}`}
                   className={`h-8 min-w-8 rounded-md px-2 text-center leading-8 transition ${
                     page === currentPage
                       ? "bg-pink-500 text-white shadow-lg shadow-pink-500/20"
@@ -175,7 +179,7 @@ export default async function PhimBoPage({ searchParams }: PhimBoPageProps) {
               ),
             )}
             <Link
-              href={`/phimbo?page=${Math.min(totalPages, currentPage + 1)}${currentType ? `&type=${encodeURIComponent(currentType)}` : ""}`}
+              href={`/phimbo?page=${Math.min(totalPages, currentPage + 1)}${currentType ? `&type=${encodeURIComponent(currentType)}` : ""}${currentSearch ? `&search=${encodeURIComponent(currentSearch)}` : ""}`}
               className={`flex h-8 w-8 items-center justify-center rounded-full border border-white/10 transition ${
                 currentPage === totalPages
                   ? "pointer-events-none text-zinc-600"

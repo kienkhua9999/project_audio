@@ -97,7 +97,7 @@ export default async function TinTucPage({ searchParams }: TinTucPageProps) {
               className={`flex h-8 w-8 items-center justify-center rounded-full border border-white/10 transition ${
                 currentPage === 1
                   ? "pointer-events-none text-zinc-600"
-                  : "text-zinc-300 hover:border-fuchsia-500/50 hover:bg-fuchsia-500/10 hover:text-white"
+                  : "text-zinc-300 hover:border-pink-500/50 hover:bg-pink-500/10 hover:text-white"
               }`}
             >
               &lt;
@@ -114,7 +114,7 @@ export default async function TinTucPage({ searchParams }: TinTucPageProps) {
                   href={`/tintuc?page=${page}`}
                   className={`h-8 min-w-8 rounded-md px-2 text-center leading-8 transition ${
                     page === currentPage
-                      ? "bg-fuchsia-500 text-white shadow-lg shadow-fuchsia-500/20"
+                      ? "bg-pink-500 text-white shadow-lg shadow-pink-500/20"
                       : "hover:bg-white/10 text-zinc-400 hover:text-white"
                   }`}
                 >
@@ -128,7 +128,7 @@ export default async function TinTucPage({ searchParams }: TinTucPageProps) {
               className={`flex h-8 w-8 items-center justify-center rounded-full border border-white/10 transition ${
                 currentPage === totalPages
                   ? "pointer-events-none text-zinc-600"
-                  : "text-zinc-300 hover:border-fuchsia-500/50 hover:bg-fuchsia-500/10 hover:text-white"
+                  : "text-zinc-300 hover:border-pink-500/50 hover:bg-pink-500/10 hover:text-white"
               }`}
             >
               &gt;

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import AdBanner from "./AdBanner";
 import { categories } from "../data";
 
@@ -37,8 +38,17 @@ const bottomMobileKeys = [
 ];
 
 export function Header({ activeCategory }: HeaderProps) {
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showBottomAds, setShowBottomAds] = useState(true);
+  const [searchValue, setSearchValue] = useState("");
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && searchValue.trim()) {
+      router.push(`/phimbo?search=${encodeURIComponent(searchValue.trim())}`);
+      setIsMenuOpen(false);
+    }
+  };
 
   const getHref = (category: string) => {
     switch (category) {
@@ -87,11 +97,17 @@ export function Header({ activeCategory }: HeaderProps) {
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="hidden w-full max-w-[200px] items-center rounded-full border border-white/15 bg-white/5 px-4 py-1.5 md:flex lg:max-w-xs">
+              <div className="hidden w-full max-w-[200px] items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 md:flex lg:max-w-xs">
                 <input
-                  placeholder="Tìm kiếm..."
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                  onKeyDown={handleSearch}
+                  placeholder="Tìm kiếm phim..."
                   className="w-full bg-transparent text-xs text-white placeholder:text-zinc-400 focus:outline-none"
                 />
+                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="h-4 w-4 text-zinc-400">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
               </div>
 
               <button
@@ -186,11 +202,17 @@ export function Header({ activeCategory }: HeaderProps) {
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
         <div className="border-t border-white/10 bg-black/95 p-5 md:hidden">
-          <div className="mb-6 flex items-center rounded-full border border-white/15 bg-white/5 px-4 py-2">
+          <div className="mb-6 flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2">
             <input
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              onKeyDown={handleSearch}
               placeholder="Tìm kiếm phim..."
               className="w-full bg-transparent text-sm text-white placeholder:text-zinc-400 focus:outline-none"
             />
+             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="h-4 w-4 text-zinc-400">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
           </div>
           <nav className="flex flex-col gap-4">
             {categories.slice(0, 4).map((item) => (
