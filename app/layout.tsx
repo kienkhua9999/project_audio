@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
+import PopunderManager from "./components/PopunderManager";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -29,8 +29,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        {/* popunder */}
-       <Script src="https://pl28850045.effectivegatecpm.com/fb/6f/87/fb6f87d26b7d7e4d1afc6f8ee65d73c5.js" strategy="afterInteractive" />
+        {/* popunder – Option 2: lần 1 ngay, lần 2 sau 3-5 phút, max 2/session */}
+        <PopunderManager />
         {children}
       </body>
     </html>
