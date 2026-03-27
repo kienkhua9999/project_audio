@@ -9,7 +9,7 @@ export default function SidebarAd() {
       <div className="rounded-xl bg-white/5 p-2 backdrop-blur-sm border border-white/10">
         <p className="mb-2 text-center text-[10px] uppercase tracking-widest text-zinc-500">Quảng cáo</p>
         <AdSense 
-          slot="YOUR_SIDEBAR_SLOT_ID" 
+          slot={process.env.NEXT_PUBLIC_ADSENSE_SIDEBAR_SLOT!} 
           format="vertical" 
           style={{ width: "300px", height: "600px" }}
         />
@@ -17,7 +17,7 @@ export default function SidebarAd() {
       
       {/* Thêm một banner nhỏ nếu sidebar quá dài */}
       <div className="rounded-xl bg-white/5 p-2 backdrop-blur-sm border border-white/10">
-        <AdSense slot="YOUR_SIDEBAR_SECOND_SLOT_ID" format="auto" />
+        <AdSense slot={process.env.NEXT_PUBLIC_ADSENSE_SIDEBAR_SLOT!} format="auto" />
       </div>
     </aside>
   );

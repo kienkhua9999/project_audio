@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useRef, useEffect } from "react";
+import AdSense from "./AdSense";
 
 export type WatchEpisode = {
   id: number;
@@ -45,6 +46,10 @@ export function WatchPlayer({
   const currentIndex = useMemo(() => {
     return episodes.findIndex((e) => e.id === activeEpisodeId);
   }, [episodes, activeEpisodeId]);
+
+  const nextEpisode = useMemo(() => {
+    return episodes[currentIndex + 1] || null;
+  }, [episodes, currentIndex]);
 
   const episodeIndexForPagination = currentIndex !== -1 ? currentIndex : 0;
   const pageForActiveDirect = Math.floor(episodeIndexForPagination / EPISODES_PER_PAGE) + 1;
@@ -96,7 +101,6 @@ export function WatchPlayer({
     const video = videoRef.current;
     if (!video || !activeEpisode?.videoUrl) return;
 
-    // Dọn dẹp Hls instance cũ nếu có
     if (hlsRef.current) {
       hlsRef.current.destroy();
       hlsRef.current = null;
@@ -125,7 +129,7 @@ export function WatchPlayer({
       const initHls = (Hls: any, v: HTMLVideoElement, url: string) => {
         if (Hls.isSupported()) {
           const hls = new Hls();
-          hlsRef.current = hls; // Lưu vào ref
+          hlsRef.current = hls;
           hls.loadSource(url);
           hls.attachMedia(v);
         } else if (v.canPlayType("application/vnd.apple.mpegurl")) {
@@ -136,12 +140,10 @@ export function WatchPlayer({
 
       loadHls();
     } else {
-      // Dành cho mp4, set src thẳng vào thẻ thay vì thẻ con <source>
       video.src = formattedUrl;
       video.load();
     }
 
-    // Dọn dẹp memory khi component unmount
     return () => {
       if (hlsRef.current) {
         hlsRef.current.destroy();
@@ -149,6 +151,21 @@ export function WatchPlayer({
       }
     };
   }, [activeEpisode?.videoUrl]);
+
+  // Tự động chuyển tập khi kết thúc video
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleEnded = () => {
+      if (nextEpisode) {
+        handlePickEpisode(nextEpisode.id);
+      }
+    };
+
+    video.addEventListener("ended", handleEnded);
+    return () => video.removeEventListener("ended", handleEnded);
+  }, [nextEpisode]);
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -201,23 +218,18 @@ export function WatchPlayer({
     setShowControls(true);
   };
 
-  // FULLSCREEN HOÀN CHỈNH (Hỗ trợ trình duyệt và cực chuẩn cho iPhone Safari)
   const toggleFullscreen = () => {
     if (!videoRef.current && !wrapperRef.current) return;
-    
     const wrapper = wrapperRef.current;
-    
     if (!document.fullscreenElement) {
-      // Mở fullscreen
       if (wrapper?.requestFullscreen) {
         wrapper.requestFullscreen();
       } else if ((wrapper as any).webkitRequestFullscreen) {
-        (wrapper as any).webkitRequestFullscreen(); // Safari
+        (wrapper as any).webkitRequestFullscreen();
       } else if ((videoRef.current as any).webkitEnterFullscreen) {
-        (videoRef.current as any).webkitEnterFullscreen(); // iPhone iOS
+        (videoRef.current as any).webkitEnterFullscreen();
       }
     } else {
-      // Thoát fullscreen
       if (document.exitFullscreen) {
         document.exitFullscreen();
       } else if ((document as any).webkitExitFullscreen) {
@@ -227,7 +239,6 @@ export function WatchPlayer({
     setShowControls(true);
   };
 
-  // Hỗ trợ hiển thị Giờ : Phút : Giây nếu video trên 60 phút
   const formatTime = (time: number) => {
     if (!time || isNaN(time)) return "0:00";
     const hours = Math.floor(time / 3600);
@@ -245,14 +256,12 @@ export function WatchPlayer({
 
   return (
     <section className="flex flex-col gap-6 lg:flex-row lg:items-stretch lg:min-h-[820px]">
-      {/* Player bên trái */}
       <div className="min-w-0 flex-1 self-stretch rounded-3xl bg-black/40 p-5 lg:h-full">
         <div className="mx-auto flex h-full w-full max-w-[480px] flex-col">
           <div 
             ref={wrapperRef}
             className="group relative aspect-[9/16] w-full max-w-full max-h-full mx-auto overflow-hidden rounded-3xl bg-black"
           >
-            {/* THẺ VIDEO: Bỏ thẻ <source> - gán thẳng src bằng logic useEffect ở trên */}
             <video
               ref={videoRef}
               playsInline
@@ -265,23 +274,17 @@ export function WatchPlayer({
               className="h-full w-full rounded-3xl bg-black object-contain"
             ></video>
 
-            {/* Overlay to handle play/pause click without conflicting with native controls */}
             <div 
               className={`absolute inset-0 z-10 cursor-pointer transition-colors duration-300 ${!isPlaying ? "bg-black/40" : (showControls ? "bg-black/20" : "bg-transparent")}`} 
               onClick={(e) => {
                 if (e.target === e.currentTarget) {
-                  if (showControls) {
-                    togglePlay();
-                  } else {
-                    setShowControls(true);
-                  }
+                  if (showControls) togglePlay();
+                  else setShowControls(true);
                 }
               }}
             />
 
-            {/* Custom Bottom Control Bar */}
             <div className={`absolute inset-x-0 bottom-0 z-30 flex flex-col gap-2 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-4 transition-opacity duration-300 ${showControls || !isPlaying ? "opacity-100" : "opacity-0"}`}>
-              {/* Progress Bar */}
               <input
                 type="range"
                 min={0}
@@ -291,17 +294,9 @@ export function WatchPlayer({
                 className="h-1 w-full cursor-pointer appearance-none rounded-lg bg-white/20 accent-pink-500"
                 aria-label="Tiến độ video"
               />
-
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      togglePlay();
-                    }}
-                    className="text-white transition hover:text-pink-400 cursor-pointer"
-                  >
+                  <button type="button" onClick={(e) => { e.stopPropagation(); togglePlay(); }} className="text-white transition hover:text-pink-400">
                     {isPlaying ? (
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6">
                         <path fillRule="evenodd" d="M6.75 5.25a.75.75 0 0 1 .75.75v12a.75.75 0 0 1-1.5 0v-12a.75.75 0 0 1 .75-.75Zm9 0a.75.75 0 0 1 .75.75v12a.75.75 0 0 1-1.5 0v-12a.75.75 0 0 1 .75-.75Z" clipRule="evenodd" />
@@ -312,49 +307,21 @@ export function WatchPlayer({
                       </svg>
                     )}
                   </button>
-
                   <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        skipBackward();
-                      }}
-                      className="text-white hover:text-pink-400 cursor-pointer"
-                      title="Lùi 5s"
-                    >
+                    <button type="button" onClick={(e) => { e.stopPropagation(); skipBackward(); }} className="text-white hover:text-pink-400">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-5 w-5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                       </svg>
                     </button>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        skipForward();
-                      }}
-                      className="text-white hover:text-pink-400 cursor-pointer"
-                      title="Tiến 5s"
-                    >
+                    <button type="button" onClick={(e) => { e.stopPropagation(); skipForward(); }} className="text-white hover:text-pink-400">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-5 w-5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                       </svg>
                     </button>
                   </div>
-
-                  <span className="text-xs text-zinc-200">
-                    {formatTime(currentTime)} / {formatTime(duration)}
-                  </span>
+                  <span className="text-xs text-zinc-200">{formatTime(currentTime)} / {formatTime(duration)}</span>
                 </div>
-
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleFullscreen();
-                  }}
-                  className="text-white hover:text-pink-400 cursor-pointer"
-                >
+                <button type="button" onClick={(e) => { e.stopPropagation(); toggleFullscreen(); }} className="text-white hover:text-pink-400">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-5 w-5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
                   </svg>
@@ -362,15 +329,10 @@ export function WatchPlayer({
               </div>
             </div>
 
-            {/* Central Play/Pause Toggle - Visible when paused or at the start */}
             <div className={`pointer-events-none absolute left-1/2 top-1/2 z-20 flex -translate-x-1/2 -translate-y-1/2 items-center transition-opacity duration-300 ${!isPlaying ? "opacity-100 scale-100" : "opacity-0 scale-110"}`}>
                <div
                   className="flex h-20 w-20 items-center justify-center rounded-full bg-pink-500/80 text-white shadow-2xl backdrop-blur-sm transition cursor-pointer pointer-events-auto hover:scale-110 hover:bg-pink-500"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    togglePlay();
-                  }}
-                  aria-label="Phát video/Tạm dừng"
+                  onClick={(e) => { e.stopPropagation(); togglePlay(); }}
                 >
                   {isPlaying ? (
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-10 w-10">
@@ -384,103 +346,46 @@ export function WatchPlayer({
                 </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => window.history.back()}
-              className="absolute left-4 top-4 z-30 inline-flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-lg text-white backdrop-blur hover:bg-black/75 cursor-pointer opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-              aria-label="Đóng"
-              title="Đóng"
-            >
-              ✕
-            </button>
-
-            <div className="absolute -right-14 top-1/2 z-10 hidden -translate-y-1/2 flex-col gap-3 lg:flex">
-              <button
-                type="button"
-                onClick={() => {
-                  const currentIndex = episodes.findIndex(e => e.id === activeEpisodeId);
-                  if (currentIndex > 0) {
-                    handlePickEpisode(episodes[currentIndex - 1].id);
-                  }
-                }}
-                disabled={episodes.findIndex(e => e.id === activeEpisodeId) === 0}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-900 text-white backdrop-blur hover:bg-gray-800 disabled:opacity-30 cursor-pointer"
-                aria-label="Tập trước"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  className="h-5 w-5"
-                  aria-hidden="true"
-                >
-                  <path d="M6 14l6-6 6 6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  const currentIndex = episodes.findIndex(e => e.id === activeEpisodeId);
-                  if (currentIndex < episodes.length - 1) {
-                    handlePickEpisode(episodes[currentIndex + 1].id);
-                  }
-                }}
-                disabled={episodes.findIndex(e => e.id === activeEpisodeId) === episodes.length - 1}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-900 text-white backdrop-blur hover:bg-gray-800 disabled:opacity-30 cursor-pointer"
-                aria-label="Tập tiếp"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  className="h-5 w-5"
-                  aria-hidden="true"
-                >
-                  <path d="M6 10l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-            </div>
+            <button type="button" onClick={() => window.history.back()} className="absolute left-4 top-4 z-30 inline-flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-lg text-white backdrop-blur hover:bg-black/75 transition-opacity duration-300 group-hover:opacity-100 opacity-0">✕</button>
           </div>
+
+          <div className="mt-4 w-full overflow-hidden rounded-xl border border-white/5 bg-white/5 p-2 flex flex-col items-center">
+            <AdSense slot={process.env.NEXT_PUBLIC_ADSENSE_BELOW_PLAYER_SLOT!} format="horizontal" />
+          </div>
+
+          {nextEpisode && (
+            <button
+               type="button"
+               onClick={() => handlePickEpisode(nextEpisode.id)}
+               className="mt-4 flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-pink-600 to-rose-500 py-3.5 text-base font-bold text-white shadow-lg shadow-pink-600/20 transition hover:scale-[1.02] active:scale-95"
+            >
+               <span>Xem tiếp: Tập {nextEpisode.episodeNumber}</span>
+               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
+                  <path fillRule="evenodd" d="M12.97 3.97a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 1 1-1.06-1.06l6.22-6.22H3a.75.75 0 0 1 0-1.5h16.19l-6.22-6.22a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+               </svg>
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Panel bên phải */}
       <aside className="flex w-full shrink-0 self-stretch flex-col rounded-3xl bg-white/5 p-5 lg:h-full lg:w-[420px] lg:overflow-y-auto">
         <h1 className="text-xl font-bold text-white">{title}</h1>
-
         <div className="mt-2 flex flex-wrap items-center gap-4 text-sm text-zinc-300">
           <span className="inline-flex items-center gap-2">
-            <span className="opacity-80">❤</span>
-            {viewsText}
+            <span className="opacity-80">❤</span>{viewsText}
           </span>
           <span className="inline-flex items-center gap-2">
-            <span className="opacity-80">💬</span>
-            {viewsText} // Chỉnh sửa lại số lượng comment nếu có
+            <span className="opacity-80">💬</span>{viewsText}
           </span>
         </div>
-
         {tags.length ? (
           <div className="mt-3 flex flex-wrap gap-2">
             {tags.map((t) => (
-              <span
-                key={t}
-                className="rounded-full border border-white/15 px-3 py-1 text-xs text-white/90"
-              >
-                {t}
-              </span>
+              <span key={t} className="rounded-full border border-white/15 px-3 py-1 text-xs text-white/90">{t}</span>
             ))}
           </div>
         ) : null}
-
-        <p className="mt-4 text-sm leading-relaxed text-zinc-300 line-clamp-4">
-          {description}
-        </p>
-
-        {/* Tabs page */}
+        <p className="mt-4 text-sm leading-relaxed text-zinc-300 line-clamp-4">{description}</p>
         {totalPages > 1 ? (
           <div className="mt-6 flex flex-wrap items-center gap-3 text-xs text-zinc-300">
             {pageTabs.map((t) => (
@@ -488,37 +393,20 @@ export function WatchPlayer({
                 key={t.page}
                 type="button"
                 onClick={() => setActivePage(t.page)}
-                className={`cursor-pointer rounded-full px-3 py-1.5 transition ${
-                  activePage === t.page
-                    ? "bg-pink-500/20 text-pink-200"
-                    : "bg-white/5 hover:bg-white/10"
-                }`}
-              >
-                {t.label}
-              </button>
+                className={`cursor-pointer rounded-full px-3 py-1.5 transition ${activePage === t.page ? "bg-pink-500/20 text-pink-200" : "bg-white/5 hover:bg-white/10"}`}
+              >{t.label}</button>
             ))}
-            <span className="ml-auto text-zinc-400">
-              Tập {activeEpisode?.episodeNumber ?? 1}/{episodes.length}
-            </span>
+            <span className="ml-auto text-zinc-400">Tập {activeEpisode?.episodeNumber ?? 1}/{episodes.length}</span>
           </div>
         ) : null}
-
-        {/* Grid episode picker */}
         <div className="mt-4 grid grid-cols-5 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-6 mb-4">
           {pageEpisodes.map((e) => (
             <button
               key={e.id}
               type="button"
               onClick={() => handlePickEpisode(e.id)}
-              className={`cursor-pointer rounded-lg px-0 py-2 text-center text-xs font-semibold transition ${
-                e.id === activeEpisodeId
-                  ? "bg-pink-500 text-white"
-                  : "bg-white/5 text-zinc-200 hover:bg-white/10"
-              }`}
-              aria-label={`Chọn tập ${e.id}`}
-            >
-              {e.episodeNumber}
-            </button>
+              className={`cursor-pointer rounded-lg px-0 py-2 text-center text-xs font-semibold transition ${e.id === activeEpisodeId ? "bg-pink-500 text-white" : "bg-white/5 text-zinc-200 hover:bg-white/10"}`}
+            >{e.episodeNumber}</button>
           ))}
         </div>
       </aside>

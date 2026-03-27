@@ -122,8 +122,11 @@ export default async function PhimBoPage({ searchParams }: PhimBoPageProps) {
                 {/* IN-FEED ADS: Sau mỗi 4 item phim thì chèn 1 item quảng cáo */}
                 {index > 0 && index % 4 === 0 && (
                   <div className="col-span-full xl:col-span-1 flex flex-col items-center justify-center rounded-xl bg-white/5 border border-white/10 p-4">
-                    <span className="mb-2 text-[10px] text-zinc-500 uppercase tracking-widest text-center">Đề xuất</span>
-                     <AdSense slot="YOUR_IN_FEED_ARCHIVE_ID" format="fluid" />
+                     <AdSense 
+                        slot={process.env.NEXT_PUBLIC_ADSENSE_IN_FEED_SLOT!} 
+                        format="fluid" 
+                        layoutKey={process.env.NEXT_PUBLIC_ADSENSE_IN_FEED_LAYOUT_KEY!}
+                      />
                   </div>
                 )}
                 
