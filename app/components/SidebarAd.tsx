@@ -1,51 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import AdBanner from "./AdBanner";
+import AdSense from "./AdSense";
 
 export default function SidebarAd() {
-  const [isVisible1, setIsVisible1] = useState(true);
-  const [isVisible2, setIsVisible2] = useState(true);
-
-  if (!isVisible1 && !isVisible2) return null;
-
   return (
-    <aside className="sticky top-0 hidden h-fit w-[160px] flex-shrink-0 flex-col gap-0 leading-[0] xl:flex">
-      {/* First Ad */}
-      {isVisible1 && (
-        <div className="flex flex-col">
-          <div className="flex justify-center bg-[#07090e]">
-            <button
-              type="button"
-              onClick={() => setIsVisible1(false)}
-              className="w-full bg-orange-600/80 py-1 text-[10px] font-bold uppercase text-white transition hover:bg-orange-600"
-            >
-              Tắt QC ✕
-            </button>
-          </div>
-          <div className="h-[600px] w-[160px] overflow-hidden">
-            <AdBanner id="cbec996c590b968b9c24a1b3f85112c3" width={160} height={600} />
-          </div>
-        </div>
-      )}
-
-      {/* Second Ad */}
-      {isVisible2 && (
-        <div className={`flex flex-col ${isVisible1 ? "-mt-16" : ""}`}>
-          <div className="flex justify-center bg-[#07090e]">
-            <button
-              type="button"
-              onClick={() => setIsVisible2(false)}
-              className="w-full bg-orange-600/80 py-1 text-[10px] font-bold uppercase text-white transition hover:bg-orange-600"
-            >
-              Tắt QC ✕
-            </button>
-          </div>
-          <div className="h-[600px] w-[160px] overflow-hidden">
-            <AdBanner id="cbec996c590b968b9c24a1b3f85112c3" width={160} height={600} />
-          </div>
-        </div>
-      )}
+    <aside className="sticky top-20 hidden h-fit w-[300px] flex-shrink-0 flex-col gap-4 xl:flex">
+      {/* Banner dọc hái ra tiền (300x600) */}
+      <div className="rounded-xl bg-white/5 p-2 backdrop-blur-sm border border-white/10">
+        <p className="mb-2 text-center text-[10px] uppercase tracking-widest text-zinc-500">Quảng cáo</p>
+        <AdSense 
+          slot="YOUR_SIDEBAR_SLOT_ID" 
+          format="vertical" 
+          style={{ width: "300px", height: "600px" }}
+        />
+      </div>
+      
+      {/* Thêm một banner nhỏ nếu sidebar quá dài */}
+      <div className="rounded-xl bg-white/5 p-2 backdrop-blur-sm border border-white/10">
+        <AdSense slot="YOUR_SIDEBAR_SECOND_SLOT_ID" format="auto" />
+      </div>
     </aside>
   );
 }

@@ -3,44 +3,19 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import AdBanner from "./AdBanner";
+
 import { categories } from "../data";
 
 type HeaderProps = {
   activeCategory: string;
 };
 
-const topDesktopKeys = [
-  "9e8ee2cfb56287b0e7bb83a8a0d0b922",
-  "9e8ee2cfb56287b0e7bb83a8a0d0b922",
-  "9e8ee2cfb56287b0e7bb83a8a0d0b922",
-  "9e8ee2cfb56287b0e7bb83a8a0d0b922",
-];
 
-const topMobileKeys = [
-  "d85056a55adf2565c57f2d5feb6679d9",
-  "d85056a55adf2565c57f2d5feb6679d9",
-  "d85056a55adf2565c57f2d5feb6679d9",
-];
-
-const bottomDesktopKeys = [
-  "d85056a55adf2565c57f2d5feb6679d9",
-  "d85056a55adf2565c57f2d5feb6679d9",
-  "d85056a55adf2565c57f2d5feb6679d9",
-  "d85056a55adf2565c57f2d5feb6679d9",
-];
-
-const bottomMobileKeys = [
-  "d85056a55adf2565c57f2d5feb6679d9",
-  "d85056a55adf2565c57f2d5feb6679d9",
-  "d85056a55adf2565c57f2d5feb6679d9",
-  "d85056a55adf2565c57f2d5feb6679d9",
-];
 
 export function Header({ activeCategory }: HeaderProps) {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showBottomAds, setShowBottomAds] = useState(true);
+
   const [searchValue, setSearchValue] = useState("");
 
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -91,10 +66,7 @@ export function Header({ activeCategory }: HeaderProps) {
               </nav>
             </div>
 
-            {/* Banner ad next to menu */}
-            <div className="hidden h-[60px] w-[468px] items-center justify-center overflow-hidden lg:flex">
-              <AdBanner id="9e8ee2cfb56287b0e7bb83a8a0d0b922" width={468} height={60} />
-            </div>
+
 
             <div className="flex items-center gap-4">
               <div className="hidden w-full max-w-[200px] items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 md:flex lg:max-w-xs">
@@ -131,73 +103,7 @@ export function Header({ activeCategory }: HeaderProps) {
         </div>
       </header>
 
-      {/* Ads Below Menu */}
-      <div className="mx-auto w-full max-w-[120rem] px-5 py-4 md:px-8 lg:px-10">
-        <div className="flex flex-col items-center">
-          <div className="grid grid-cols-1 gap-1 md:grid-cols-2">
-            {topDesktopKeys.slice(0, 4).map((key, index) => (
-              <div
-                key={`ad-under-menu-${index}`}
-                className="hidden h-[60px] w-[468px] items-center justify-center overflow-hidden lg:flex"
-              >
-                <AdBanner id={key} width={468} height={60} />
-              </div>
-            ))}
-          </div>
-          
-          {/* Mobile version of ads below menu */}
-          <div className="grid grid-cols-1 gap-1 lg:hidden">
-            {topMobileKeys.slice(0, 2).map((key, index) => (
-              <div
-                key={`ad-under-menu-mobile-${index}`}
-                className="flex h-[50px] w-[320px] items-center justify-center overflow-hidden"
-              >
-                <AdBanner id={key} width={320} height={50} />
-              </div>
-            ))}
-          </div>
 
-        </div>
-      </div>
-
-      {/* Fixed Bottom Ads Container */}
-      {showBottomAds && (
-        <div className="fixed bottom-0 left-0 right-0 z-[100]">
-          <div className="mx-auto flex flex-col items-center">
-            <button
-              type="button"
-              onClick={() => setShowBottomAds(false)}
-              className="flex items-center gap-1 rounded bg-orange-500 px-3 py-0.5 text-[10px] font-bold uppercase text-white hover:bg-orange-600"
-            >
-              Tắt QC ✕
-            </button>
-
-            {/* Desktop Fixed Ads: 2x2 cluster, no gaps */}
-            <div className="hidden max-w-[936px] flex-wrap items-start justify-center leading-[0] lg:flex">
-              {bottomDesktopKeys.map((key, index) => (
-                <div
-                  key={`ad-fixed-bottom-${index}`}
-                  className="h-[60px] w-[468px] overflow-hidden"
-                >
-                  <AdBanner id={key} width={468} height={60} />
-                </div>
-              ))}
-            </div>
-
-            {/* Mobile Fixed Ads: 2x2 cluster, no gaps */}
-            <div className="flex flex-wrap items-center justify-center leading-[0] lg:hidden">
-              {bottomMobileKeys.slice(0, 4).map((key, index) => (
-                <div
-                  key={`ad-fixed-bottom-mobile-${index}`}
-                  className="h-[50px] w-[160px] overflow-hidden"
-                >
-                  <AdBanner id={key} width={160} height={50} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (

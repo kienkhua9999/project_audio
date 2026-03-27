@@ -117,23 +117,33 @@ export default async function PhimBoPage({ searchParams }: PhimBoPageProps) {
 
           <section className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
             {phimBoItems.map((item, index) => (
-              <Link key={`${item.id}-${index}`} href={`/detail/${item.id}`} className="group">
-                <div className="overflow-hidden rounded-xl bg-white/5 border border-white/10">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="aspect-[16/9] w-full object-cover transition duration-300 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                </div>
-                <h3 className="mt-2 line-clamp-2 text-sm font-semibold text-zinc-100 group-hover:text-pink-300">
-                  {item.title}
-                </h3>
-                <div className="mt-1 flex items-center justify-between text-[11px] text-zinc-400">
-                  <span className="line-clamp-1 flex-1">{item.tags || item.description}</span>
-                  <span className="ml-2 whitespace-nowrap">{(item.views || 0).toLocaleString()} lượt xem</span>
-                </div>
-              </Link>
+              <div key={`${item.id}-${index}-wrapper`} className="contents">
+                {/* IN-FEED ADS: Sau mỗi 4 item phim thì chèn 1 item quảng cáo */}
+                {index > 0 && index % 4 === 0 && (
+                  <div className="col-span-full xl:col-span-1 flex flex-col items-center justify-center rounded-xl bg-white/5 border border-white/10 p-4">
+                    <span className="mb-2 text-[10px] text-zinc-500 uppercase tracking-widest text-center">Đề xuất</span>
+                     <AdSense slot="YOUR_IN_FEED_ARCHIVE_ID" format="fluid" />
+                  </div>
+                )}
+                
+                <Link href={`/detail/${item.id}`} className="group h-full">
+                  <div className="overflow-hidden rounded-xl bg-white/5 border border-white/10">
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="aspect-[16/9] w-full object-cover transition duration-300 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  </div>
+                  <h3 className="mt-2 line-clamp-2 text-sm font-semibold text-zinc-100 group-hover:text-pink-300">
+                    {item.title}
+                  </h3>
+                  <div className="mt-1 flex items-center justify-between text-[11px] text-zinc-400">
+                    <span className="line-clamp-1 flex-1">{item.tags || item.description}</span>
+                    <span className="ml-2 whitespace-nowrap">{(item.views || 0).toLocaleString()} lượt xem</span>
+                  </div>
+                </Link>
+              </div>
             ))}
           </section>
 

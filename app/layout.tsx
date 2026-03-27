@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import PopunderManager from "./components/PopunderManager";
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -25,12 +25,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Google AdSense Auto Ads: Anchor & Vignette */}
+        <script 
+          async 
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9470172813725144"
+          crossOrigin="anonymous"
+        ></script>
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        {/* popunder – Option 2: lần 1 ngay, lần 2 sau 3-5 phút, max 2/session */}
-        <PopunderManager />
         {children}
       </body>
     </html>

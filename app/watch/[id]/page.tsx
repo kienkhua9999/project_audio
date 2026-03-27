@@ -3,6 +3,7 @@ import { Footer } from "../../components/Footer";
 import { Header } from "../../components/Header";
 import { WatchPlayer } from "../../components/WatchPlayer";
 import SidebarAd from "../../components/SidebarAd";
+import AdSense from "../../components/AdSense";
 
 type WatchPageProps = {
   params: Promise<{
@@ -78,7 +79,6 @@ export default async function WatchPage({ params }: WatchPageProps) {
   }
 
   if (!data) {
-    // Return a basic error layout instead of redirecting to avoid loops
     return (
       <div className="min-h-screen bg-[#06070b] text-white">
         <Header activeCategory="Trang chủ" />
@@ -95,7 +95,6 @@ export default async function WatchPage({ params }: WatchPageProps) {
   }
 
   const { episode, series, recommendations } = data;
-
   const allEpisodes = series.episodesList || series.episodes || [];
   const episodes = allEpisodes.map((ep) => ({
     id: ep.id,
@@ -109,23 +108,15 @@ export default async function WatchPage({ params }: WatchPageProps) {
       <Header activeCategory="Trang chủ" />
 
       <div className="relative mx-auto flex w-full max-w-[1620px] justify-center gap-0">
-        {/* Left Side Ads */}
         <SidebarAd />
 
         <main className="w-full max-w-[1300px] px-5 py-8 md:px-8 lg:px-10">
-          {/* Breadcrumb */}
           <nav className="mb-6 text-xs text-zinc-400 md:text-sm">
-            <Link href="/" className="hover:text-white transition">
-              Trang chủ
-            </Link>
+            <Link href="/" className="hover:text-white transition">Trang chủ</Link>
             <span className="mx-1.5 text-zinc-500">{">"}</span>
-            <Link href="/phimbo" className="hover:text-white transition">
-              Phim bộ
-            </Link>
+            <Link href="/phimbo" className="hover:text-white transition">Phim bộ</Link>
             <span className="mx-1.5 text-zinc-500">{">"}</span>
-            <Link href={`/detail/${series.id}`} className="hover:text-white transition">
-              {series.title}
-            </Link>
+            <Link href={`/detail/${series.id}`} className="hover:text-white transition">{series.title}</Link>
             <span className="mx-1.5 text-zinc-500">{">"}</span>
             <span className="text-white">Tập {episode.episodeNumber}</span>
           </nav>
@@ -139,42 +130,45 @@ export default async function WatchPage({ params }: WatchPageProps) {
             initialEpisodeId={episode.id}
           />
 
-          {/* Cụm đề xuất */}
+          {/* VỊ TRÍ VÀNG 1: Ngay dưới Player */}
+          <div className="mt-8 flex justify-center">
+            <div className="w-full max-w-[970px] overflow-hidden rounded-xl border border-white/5 bg-white/5 p-4 flex flex-col items-center">
+              <span className="mb-2 text-[10px] uppercase tracking-widest text-zinc-500">Quảng cáo đề xuất</span>
+              <AdSense slot="YOUR_BELOW_PLAYER_SLOT_ID" format="horizontal" />
+            </div>
+          </div>
+
           <section className="mt-12">
             <h2 className="text-2xl font-bold text-white">Đề xuất cho bạn</h2>
-
             <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
-              {recommendations.map((item) => (
-                <article
-                  key={`recommend-${item.id}`}
-                  className="group overflow-hidden rounded-2xl border border-white/10 bg-white/5 transition hover:border-white/20"
-                >
-                  <Link href={`/detail/${item.id}`}>
-                    <div className="overflow-hidden">
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="aspect-[16/9] w-full object-cover transition duration-300 group-hover:scale-110"
-                      />
+              {recommendations.map((item, index) => (
+                <div key={`recommend-wrapper-${item.id}`}>
+                  {/* IN-FEED ADS: Xuất hiện ở vị trí thứ 6 trong danh sách trên desktop */}
+                  {index === 6 && (
+                    <div className="col-span-full my-6 overflow-hidden rounded-xl border border-white/5 bg-white/5 p-4 flex flex-col items-center">
+                       <AdSense slot="YOUR_IN_FEED_SLOT_ID" format="fluid" />
                     </div>
-
-                    <div className="space-y-1 p-3">
-                      <h3 className="line-clamp-2 text-sm font-semibold text-white group-hover:text-pink-300 transition">
-                        {item.title}
-                      </h3>
-                      <div className="flex items-center justify-between text-[11px] text-zinc-400">
-                        <span className="line-clamp-1 flex-1">{item.tags?.[0] || "Đang cập nhật"}</span>
-                        <span className="ml-2 whitespace-nowrap">{(item.views || 0).toLocaleString()} views</span>
+                  )}
+                  <article className="group overflow-hidden rounded-2xl border border-white/10 bg-white/5 transition hover:border-white/20 h-full">
+                    <Link href={`/detail/${item.id}`}>
+                      <div className="overflow-hidden">
+                        <img src={item.image} alt={item.title} className="aspect-[16/9] w-full object-cover transition duration-300 group-hover:scale-110" />
                       </div>
-                    </div>
-                  </Link>
-                </article>
+                      <div className="space-y-1 p-3">
+                        <h3 className="line-clamp-2 text-sm font-semibold text-white group-hover:text-pink-300 transition">{item.title}</h3>
+                        <div className="flex items-center justify-between text-[11px] text-zinc-400">
+                          <span className="line-clamp-1 flex-1">{item.tags?.[0] || "Đang cập nhật"}</span>
+                          <span className="ml-2 whitespace-nowrap">{(item.views || 0).toLocaleString()} views</span>
+                        </div>
+                      </div>
+                    </Link>
+                  </article>
+                </div>
               ))}
             </div>
           </section>
         </main>
 
-        {/* Right Side Ads */}
         <SidebarAd />
       </div>
 
@@ -182,4 +176,3 @@ export default async function WatchPage({ params }: WatchPageProps) {
     </div>
   );
 }
-
