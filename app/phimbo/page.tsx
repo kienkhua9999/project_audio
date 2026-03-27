@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Footer } from "../components/Footer";
 import { Header } from "../components/Header";
 import SidebarAd from "../components/SidebarAd";
+import AdSense from "../components/AdSense";
 
 type SeriesItem = {
   id: number;
