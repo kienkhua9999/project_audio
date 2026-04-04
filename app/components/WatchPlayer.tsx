@@ -81,7 +81,7 @@ export function WatchPlayer({
   const videoRef = useRef<HTMLVideoElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const hlsRef = useRef<any>(null); // Lưu trữ instance Hls để dọn dẹp
+  const hlsRef = useRef<any>(null);
 
   // Tự động ẩn controls
   useEffect(() => {
