@@ -46,8 +46,26 @@ export function Footer() {
         <div>
           <h3 className="mb-4 text-xl font-semibold text-white md:text-3xl">Về chúng tôi</h3>
           <ul className="space-y-3 text-lg text-zinc-400">
-            <li>Điều khoản dịch vụ</li>
-            <li>Chính sách Quyền riêng tư</li>
+            <li>
+              <a
+                href="https://docs.google.com/document/d/1HnMnXqD0mLtwC-MBj-DWv87a9rHPE82HVR5w3oRVwX4/edit?tab=t.0#heading=h.rwfx795shyh"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors"
+              >
+                Điều khoản dịch vụ
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://docs.google.com/document/d/1SM5dMmCIPSzSPGJjjFgEZ-cwsxYburif/edit#heading=h.5rxmcts64lny"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors"
+              >
+                Chính sách Quyền riêng tư
+              </a>
+            </li>
             <li>FAQ</li>
           </ul>
         </div>
