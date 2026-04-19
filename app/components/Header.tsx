@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { categories } from "../data";
+import AdBanner from "./AdBanner";
 
 type HeaderProps = {
   activeCategory: string;
@@ -47,8 +48,8 @@ export function Header({ activeCategory }: HeaderProps) {
           <div className="flex w-full items-center justify-between">
             <div className="flex items-center gap-10">
               <Link href="/" className="flex items-center gap-2 text-lg font-bold text-white">
-                <img src="/logo1.png" alt="NetChill Logo" className="h-10 w-auto object-contain" />
-                NetChill
+                <img src="/logo1.png" alt="ShortReelDrama Logo" className="h-10 w-auto object-contain" />
+                ShortReelDrama
               </Link>
 
               <nav className="hidden items-center gap-8 text-sm font-semibold tracking-tight text-zinc-300 md:flex lg:text-base">
@@ -67,6 +68,13 @@ export function Header({ activeCategory }: HeaderProps) {
             </div>
 
 
+
+              {/* Vị trí Banner Inline (Chỉ Desktop && Trang chủ) */}
+              {activeCategory === "Trang chủ" && (
+                <div className="hidden lg:flex flex-1 items-center justify-center px-4">
+                  <AdBanner id="81fe8e4e74899ff0b0a29fd5abbf031b" width={320} height={50} />
+                </div>
+              )}
 
             <div className="flex items-center gap-4">
               <div className="hidden w-full max-w-[200px] items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 md:flex lg:max-w-xs">
@@ -100,6 +108,13 @@ export function Header({ activeCategory }: HeaderProps) {
               </button>
             </div>
           </div>
+
+          {/* Banner Vị Trí 1 dành riêng cho Mobile (Vì Mobile không thể nằm cùng hàng) */}
+          {activeCategory === "Trang chủ" && (
+            <div className="mt-2 flex w-full justify-center lg:hidden">
+              <AdBanner id="81fe8e4e74899ff0b0a29fd5abbf031b" width={320} height={50} />
+            </div>
+          )}
         </div>
       </header>
 

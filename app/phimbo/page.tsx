@@ -1,9 +1,21 @@
 import Link from "next/link";
-
+import type { Metadata } from "next";
 import { Footer } from "../components/Footer";
 import { Header } from "../components/Header";
 import SidebarAd from "../components/SidebarAd";
-import AdSense from "../components/AdSense";
+import AdBanner from "../components/AdBanner";
+
+export const metadata: Metadata = {
+  title: "Phim Bộ Hay – Xem Phim Online Miễn Phí",
+  description: "Tổng hợp phim bộ Hàn Quốc, Trung Quốc mới nhất, hay nhất. Cập nhật liên tục, xem miễn phí tại ShortReelDrama.",
+  keywords: ["phim bộ", "phim hàn quốc", "phim trung quốc", "xem phim online", "phim bộ hay"],
+  openGraph: {
+    title: "Phim Bộ Hay – ShortReelDrama",
+    description: "Tổng hợp phim bộ Hàn Quốc, Trung Quốc mới nhất, hay nhất tại ShortReelDrama.",
+    locale: "vi_VN",
+    type: "website",
+  },
+};
 
 type SeriesItem = {
   id: number;
@@ -119,17 +131,7 @@ export default async function PhimBoPage({ searchParams }: PhimBoPageProps) {
           <section className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
             {phimBoItems.map((item, index) => (
               <div key={`${item.id}-${index}-wrapper`} className="contents">
-                {/* IN-FEED ADS: Sau mỗi 4 item phim thì chèn 1 item quảng cáo */}
-                {index > 0 && index % 4 === 0 && (
-                  <div className="col-span-full xl:col-span-1 flex flex-col items-center justify-center rounded-xl bg-white/5 border border-white/10 p-4">
-                     <AdSense 
-                        slot={process.env.NEXT_PUBLIC_ADSENSE_IN_FEED_SLOT!} 
-                        format="fluid" 
-                        layoutKey={process.env.NEXT_PUBLIC_ADSENSE_IN_FEED_LAYOUT_KEY!}
-                      />
-                  </div>
-                )}
-                
+
                 <Link href={`/detail/${item.id}`} className="group h-full">
                   <div className="overflow-hidden rounded-xl bg-white/5 border border-white/10">
                     <img

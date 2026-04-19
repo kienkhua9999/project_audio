@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useRef, useEffect } from "react";
-import AdSense from "./AdSense";
+import AdBanner from "./AdBanner";
 
 export type WatchEpisode = {
   id: number;
@@ -349,9 +349,6 @@ export function WatchPlayer({
             <button type="button" onClick={() => window.history.back()} className="absolute left-4 top-4 z-30 inline-flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-lg text-white backdrop-blur hover:bg-black/75 transition-opacity duration-300 group-hover:opacity-100 opacity-0">✕</button>
           </div>
 
-          <div className="mt-4 w-full overflow-hidden rounded-xl border border-white/5 bg-white/5 p-2 flex flex-col items-center">
-            <AdSense slot={process.env.NEXT_PUBLIC_ADSENSE_BELOW_PLAYER_SLOT!} format="horizontal" />
-          </div>
 
           {nextEpisode && (
             <button

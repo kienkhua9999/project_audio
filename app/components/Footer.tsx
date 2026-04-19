@@ -73,8 +73,8 @@ export function Footer() {
         <div>
           <h3 className="mb-4 text-xl font-semibold text-white md:text-3xl">Liên hệ</h3>
           <ul className="space-y-3 text-lg text-zinc-400">
-            <li>support@netchill.com</li>
-            <li>business@netchill.com</li>
+            <li>support@shortreeldrama.online</li>
+            <li>business@shortreeldrama.online</li>
           </ul>
         </div>
 
@@ -94,7 +94,7 @@ export function Footer() {
       </div>
 
       <div className="mx-auto mt-10 w-full max-w-[120rem] border-t border-white/10 px-5 pt-5 text-center text-lg text-zinc-500 md:px-8 lg:px-10">
-        NetChill | All Rights Reserved | 2026 NETCHILL PTE. LTD.
+        ShortReelDrama | All Rights Reserved | 2026 SHORTREELDRAMA PTE. LTD.
       </div>
 
       <button

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import type { Metadata } from "next";
 import { EpisodeList } from "../../components/EpisodeList";
 import { Footer } from "../../components/Footer";
 import { Header } from "../../components/Header";
@@ -49,6 +50,28 @@ async function fetchJson<T>(url: string): Promise<T> {
   } catch (err) {
     console.error(`Failed to parse JSON from ${url}. Content:`, text);
     throw err;
+  }
+}
+
+export async function generateMetadata({ params }: DetailPageProps): Promise<Metadata> {
+  try {
+    const { id } = await params;
+    const baseUrl = process.env.BASE_URL ?? "";
+    const series = await fetchJson<SeriesDetail>(`${baseUrl}/series/${id}`);
+    return {
+      title: series.title,
+      description: series.description?.slice(0, 160) || `Xem phim ${series.title} tại ShortReelDrama`,
+      keywords: [...(series.tags || []), "xem phim ngắn", "shortreeldrama"],
+      openGraph: {
+        title: series.title,
+        description: series.description?.slice(0, 160),
+        images: [{ url: series.image, width: 800, height: 450, alt: series.title }],
+        type: "video.tv_show",
+        locale: "vi_VN",
+      },
+    };
+  } catch {
+    return { title: "Xem phim | ShortReelDrama" };
   }
 }
 

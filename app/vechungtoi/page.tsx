@@ -20,7 +20,7 @@ const coreValues = [
   {
     title: "Lắng nghe cộng đồng",
     description:
-      "Mọi góp ý của bạn đều rất quan trọng. NetChill xem phản hồi người dùng là nền tảng để cải thiện chất lượng sản phẩm lâu dài.",
+      "Mọi góp ý của bạn đều rất quan trọng. ShortReelDrama xem phản hồi người dùng là nền tảng để cải thiện chất lượng sản phẩm lâu dài.",
   },
 ];
 
@@ -43,10 +43,10 @@ export default function VeChungToiPage() {
               Về chúng tôi
             </p>
             <h1 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-              NetChill — Nền tảng xem phim ngắn, phim bộ với trải nghiệm hiện đại
+              ShortReelDrama — Nền tảng xem phim ngắn, phim bộ với trải nghiệm hiện đại
             </h1>
             <p className="mt-5 text-sm leading-relaxed text-zinc-300 md:text-base">
-              NetChill được xây dựng với mong muốn mang đến một không gian giải trí chất lượng,
+              ShortReelDrama được xây dựng với mong muốn mang đến một không gian giải trí chất lượng,
               nơi người xem có thể tìm thấy những bộ phim phù hợp với sở thích cá nhân chỉ trong
               vài thao tác. Chúng tôi theo đuổi triết lý thiết kế đơn giản, rõ ràng và hiệu quả:
               nội dung là trung tâm, còn giao diện là công cụ hỗ trợ để bạn tận hưởng trọn vẹn
@@ -73,14 +73,14 @@ export default function VeChungToiPage() {
             <p className="mt-4 text-sm leading-relaxed text-zinc-300 md:text-base">
               Chúng tôi tin rằng trải nghiệm xem phim tốt không chỉ nằm ở số lượng nội dung,
               mà còn ở cách nội dung đó được sắp xếp, trình bày và đề xuất cho người dùng.
-              Vì vậy, NetChill tập trung vào việc xây dựng một nền tảng dễ tiếp cận cho mọi đối tượng,
+              Vì vậy, ShortReelDrama tập trung vào việc xây dựng một nền tảng dễ tiếp cận cho mọi đối tượng,
               từ người mới sử dụng đến người xem thường xuyên. Mỗi cải tiến nhỏ về tốc độ tải,
               bố cục hay khả năng điều hướng đều nhằm mục tiêu giúp bạn xem nhanh hơn, hiểu rõ hơn
               và tận hưởng tốt hơn.
             </p>
             <p className="mt-4 text-sm leading-relaxed text-zinc-300 md:text-base">
               Trong tương lai, chúng tôi sẽ tiếp tục mở rộng danh mục nội dung, nâng cao chất lượng
-              đề xuất cá nhân hóa và tối ưu trải nghiệm xem đa thiết bị. Mục tiêu dài hạn của NetChill
+              đề xuất cá nhân hóa và tối ưu trải nghiệm xem đa thiết bị. Mục tiêu dài hạn của ShortReelDrama
               là trở thành một điểm đến giải trí đáng tin cậy, nơi mỗi người xem đều tìm được “gu phim”
               của riêng mình.
             </p>
@@ -102,14 +102,14 @@ export default function VeChungToiPage() {
         <section className="mt-10 rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
           <h2 className="text-2xl font-semibold">Cam kết với người xem</h2>
           <p className="mt-4 text-sm leading-relaxed text-zinc-300 md:text-base">
-            NetChill cam kết duy trì môi trường xem phim ổn định, trực quan và liên tục được cải tiến.
+            ShortReelDrama cam kết duy trì môi trường xem phim ổn định, trực quan và liên tục được cải tiến.
             Chúng tôi đặt trải nghiệm người dùng làm trọng tâm trong mọi quyết định phát triển sản phẩm:
             từ cách tổ chức danh mục, hiển thị tập phim, tối ưu luồng xem đến thiết kế giao diện dịu mắt
             khi sử dụng lâu. Đội ngũ luôn theo dõi phản hồi thực tế để nhanh chóng điều chỉnh những điểm
             chưa tối ưu và bổ sung các tính năng phù hợp với nhu cầu ngày càng đa dạng của cộng đồng.
           </p>
           <p className="mt-4 text-sm leading-relaxed text-zinc-300 md:text-base">
-            Cảm ơn bạn đã đồng hành cùng NetChill. Chính sự tin tưởng và đóng góp của người xem là động lực
+            Cảm ơn bạn đã đồng hành cùng ShortReelDrama. Chính sự tin tưởng và đóng góp của người xem là động lực
             lớn nhất để chúng tôi tiếp tục nâng cao chất lượng nền tảng mỗi ngày.
           </p>
         </section>

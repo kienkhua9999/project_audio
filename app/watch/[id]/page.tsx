@@ -1,9 +1,10 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { Footer } from "../../components/Footer";
 import { Header } from "../../components/Header";
 import { WatchPlayer } from "../../components/WatchPlayer";
 import SidebarAd from "../../components/SidebarAd";
-import AdSense from "../../components/AdSense";
+import AdBanner from "../../components/AdBanner";
 
 type WatchPageProps = {
   params: Promise<{
@@ -62,6 +63,29 @@ async function fetchJson<T>(url: string): Promise<T> {
     throw new Error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
   }
   return res.json() as Promise<T>;
+}
+
+export async function generateMetadata({ params }: WatchPageProps): Promise<Metadata> {
+  try {
+    const { id } = await params;
+    const baseUrl = process.env.BASE_URL ?? "";
+    const data = await fetchJson<EpisodeResponse>(`${baseUrl}/episodes/${id}`);
+    const { episode, series } = data;
+    const title = `${series.title} - Tập ${episode.episodeNumber}`;
+    return {
+      title,
+      description: series.description?.slice(0, 160) || `Xem ${title} tại ShortReelDrama miễn phí`,
+      openGraph: {
+        title,
+        description: series.description?.slice(0, 160),
+        images: [{ url: episode.thumbnailUrl || series.image, width: 800, height: 450, alt: title }],
+        type: "video.episode",
+        locale: "vi_VN",
+      },
+    };
+  } catch {
+    return { title: "Xem phim | ShortReelDrama" };
+  }
 }
 
 export default async function WatchPage({ params }: WatchPageProps) {
@@ -130,31 +154,13 @@ export default async function WatchPage({ params }: WatchPageProps) {
             initialEpisodeId={episode.id}
           />
 
-          {/* VỊ TRÍ VÀNG 1: Ngay dưới Player */}
-          <div className="mt-8 flex justify-center">
-            <div className="w-full max-w-[970px] overflow-hidden rounded-xl border border-white/5 bg-white/5 p-4 flex flex-col items-center">
-              <span className="mb-2 text-[10px] uppercase tracking-widest text-zinc-500">Quảng cáo đề xuất</span>
-              <AdSense slot="3163720194" format="horizontal" />
-            </div>
-          </div>
 
           <section className="mt-12">
             <h2 className="text-2xl font-bold text-white">Đề xuất cho bạn</h2>
             <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               {recommendations.map((item, index) => (
                 <div key={`recommend-wrapper-${item.id}`} className="contents">
-                  {/* IN-FEED ADS: Chèn vào vị trí số 5 (hàng 1) */}
-                  {index === 4 && (
-                    <div className="relative aspect-[9/16] overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-1">
-                      <p className="absolute top-2 left-2 z-10 rounded bg-black/60 px-1 text-[8px] uppercase text-white">Ad</p>
-                       <AdSense 
-                        slot={process.env.NEXT_PUBLIC_ADSENSE_IN_FEED_SLOT!} 
-                        format="fluid" 
-                        layoutKey={process.env.NEXT_PUBLIC_ADSENSE_IN_FEED_LAYOUT_KEY!} 
-                        style={{ height: "100%" }}
-                      />
-                    </div>
-                  )}
+
                   <article className="group overflow-hidden rounded-2xl border border-white/10 bg-white/5 transition hover:border-white/20 h-full">
                     <Link href={`/detail/${item.id}`}>
                       <div className="overflow-hidden">

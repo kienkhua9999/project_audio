@@ -1,7 +1,20 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { Footer } from "../components/Footer";
 import { Header } from "../components/Header";
 import TinTucList from "../components/TinTucList";
+
+export const metadata: Metadata = {
+  title: "Tin Tức Phim – Cập Nhật Giải Trí Mới Nhất",
+  description: "Tin tức phim mới nhất, review phim hay, cập nhật giải trí Hàn Quốc, Trung Quốc tại ShortReelDrama.",
+  keywords: ["tin tức phim", "review phim", "phim mới", "giải trí", "shortreeldrama"],
+  openGraph: {
+    title: "Tin Tức Phim – ShortReelDrama",
+    description: "Tin tức phim mới nhất, review phim hay tại ShortReelDrama.",
+    locale: "vi_VN",
+    type: "website",
+  },
+};
 
 type NewsItem = {
   id: number;

@@ -57,8 +57,14 @@ export default function AdBanner({ id, width, height, className }: AdBannerProps
   return (
     <div 
       ref={containerRef} 
-      className={`${className} overflow-hidden block leading-none`}
-      style={{ width: width, height: height }}
-    />
+      className={`${className ?? ""} overflow-hidden block leading-none relative`}
+      style={{ width: width, height: height, minWidth: width, minHeight: height }}
+    >
+      {/* Skeleton placeholder while ad loads */}
+      <div 
+        className="absolute inset-0 animate-pulse rounded bg-white/5"
+        aria-hidden="true"
+      />
+    </div>
   );
 }

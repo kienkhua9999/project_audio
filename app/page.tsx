@@ -4,6 +4,7 @@ import { Footer } from "./components/Footer";
 import { Header } from "./components/Header";
 import { Hero } from "./components/Hero";
 import { VideoSection } from "./components/VideoSection";
+import AdBanner from "./components/AdBanner";
 import type { HeroSlide, VideoSectionData } from "./data";
 
 type SliderApiItem = {
@@ -90,7 +91,6 @@ export default async function Home() {
     }));
   } catch (error) {
     console.error("Home page fetch error:", error);
-    // Only redirect if we have a referer and it's not the home page itself
     if (referer && !referer.endsWith("/")) {
       redirect(referer);
     }
@@ -102,12 +102,48 @@ export default async function Home() {
     <div className="min-h-screen bg-[#06070b]">
       <Header activeCategory="Trang chủ" />
 
-      <main>
+      <main className="flex flex-col w-full">
+
+
+             {/* VỊ TRÍ 2: Trên/Dưới Slider */}
+        <div className="flex w-full flex-col items-center justify-center gap-6 py-6 md:flex-row md:gap-10">
+          <div className="hidden md:block">
+            <AdBanner id="4a63dbe215c6b5052a1e72bc454c10ec" width={468} height={60} />
+          </div>
+          <div className="hidden md:block">
+            <AdBanner id="4a63dbe215c6b5052a1e72bc454c10ec" width={468} height={60} />
+          </div>
+          
+          <div className="block md:hidden">
+            <AdBanner id="81fe8e4e74899ff0b0a29fd5abbf031b" width={320} height={50} />
+          </div>
+          <div className="block md:hidden">
+            <AdBanner id="81fe8e4e74899ff0b0a29fd5abbf031b" width={320} height={50} />
+          </div>
+        </div>
+
         <Hero slides={heroSlides} />
 
         {sections.map((section) => (
           <VideoSection key={section.id} section={section} />
         ))}
+
+        {/* VỊ TRÍ 3: Trên Footer */}
+        <div className="mx-auto mt-10 mb-5 flex w-full max-w-[1500px] flex-col items-center justify-center gap-6 px-4 md:flex-row xl:justify-center xl:gap-8">
+          <div className="hidden md:block">
+            <AdBanner id="4a63dbe215c6b5052a1e72bc454c10ec" width={468} height={60} />
+          </div>
+          <div className="hidden md:block">
+            <AdBanner id="4a63dbe215c6b5052a1e72bc454c10ec" width={468} height={60} />
+          </div>
+
+          <div className="block md:hidden">
+            <AdBanner id="81fe8e4e74899ff0b0a29fd5abbf031b" width={320} height={50} />
+          </div>
+          <div className="block md:hidden">
+            <AdBanner id="81fe8e4e74899ff0b0a29fd5abbf031b" width={320} height={50} />
+          </div>
+        </div>
       </main>
 
       <Footer />

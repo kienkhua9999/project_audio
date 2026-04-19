@@ -1,23 +1,45 @@
 "use client";
 
-import AdSense from "./AdSense";
+import { useState } from "react";
+import AdBanner from "./AdBanner";
 
 export default function SidebarAd() {
+  const [isVisible, setIsVisible] = useState(true);
+
+  if (!isVisible) {
+    // Trả về một khối rỗng để giữ nguyên khoảng trống layout, tránh bị xộc xệch
+    return <aside className="hidden w-[300px] flex-shrink-0 xl:block"></aside>;
+  }
+
   return (
-    <aside className="sticky top-20 hidden h-fit w-[300px] flex-shrink-0 flex-col gap-4 xl:flex">
-      {/* Banner dọc hái ra tiền (300x600) */}
-      <div className="rounded-xl bg-white/5 p-2 backdrop-blur-sm border border-white/10">
-        <p className="mb-2 text-center text-[10px] uppercase tracking-widest text-zinc-500">Quảng cáo</p>
-        <AdSense 
-          slot={process.env.NEXT_PUBLIC_ADSENSE_SIDEBAR_SLOT!} 
-          format="vertical" 
-          style={{ width: "300px", height: "600px" }}
+    <aside className="sticky top-20 hidden h-fit w-[300px] flex-shrink-0 flex-col items-center xl:flex">
+      {/* Vùng Tiêu đề & Nút tắt */}
+      <div className="mb-4 flex w-full items-center justify-between px-2">
+        <button 
+          onClick={() => setIsVisible(false)}
+          className="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-[10px] text-zinc-400 transition-colors hover:bg-pink-500 hover:text-white"
+          title="Tắt quảng cáo"
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* Quảng cáo 1: 160x300 */}
+      <div className="mb-6 flex justify-center">
+        <AdBanner 
+          id={process.env.NEXT_PUBLIC_ADSTERRA_SIDEBAR_ID || "YOUR_ID_HERE"} 
+          width={160} 
+          height={300} 
         />
       </div>
       
-      {/* Thêm một banner nhỏ nếu sidebar quá dài */}
-      <div className="rounded-xl bg-white/5 p-2 backdrop-blur-sm border border-white/10">
-        <AdSense slot={process.env.NEXT_PUBLIC_ADSENSE_SIDEBAR_SLOT!} format="auto" />
+      {/* Quảng cáo 2: 300x250 */}
+      <div className="flex justify-center">
+        <AdBanner 
+          id={process.env.NEXT_PUBLIC_ADSTERRA_PLAYER_ID || "YOUR_ID_HERE"} 
+          width={300} 
+          height={250} 
+        />
       </div>
     </aside>
   );
