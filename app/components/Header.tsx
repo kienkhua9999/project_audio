@@ -69,12 +69,10 @@ export function Header({ activeCategory }: HeaderProps) {
 
 
 
-              {/* Vị trí Banner Inline (Chỉ Desktop && Trang chủ) */}
-              {activeCategory === "Trang chủ" && (
-                <div className="hidden lg:flex flex-1 items-center justify-center px-4">
-                  <AdBanner id="81fe8e4e74899ff0b0a29fd5abbf031b" width={320} height={50} />
-                </div>
-              )}
+              {/* Vị trí Banner Inline (Chỉ Desktop) */}
+              <div className="hidden lg:flex flex-1 items-center justify-center px-4">
+                <AdBanner id="81fe8e4e74899ff0b0a29fd5abbf031b" width={320} height={50} />
+              </div>
 
             <div className="flex items-center gap-4">
               <div className="hidden w-full max-w-[200px] items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 md:flex lg:max-w-xs">
@@ -110,11 +108,9 @@ export function Header({ activeCategory }: HeaderProps) {
           </div>
 
           {/* Banner Vị Trí 1 dành riêng cho Mobile (Vì Mobile không thể nằm cùng hàng) */}
-          {activeCategory === "Trang chủ" && (
-            <div className="mt-2 flex w-full justify-center lg:hidden">
-              <AdBanner id="81fe8e4e74899ff0b0a29fd5abbf031b" width={320} height={50} />
-            </div>
-          )}
+          <div className="mt-2 flex w-full justify-center lg:hidden">
+            <AdBanner id="81fe8e4e74899ff0b0a29fd5abbf031b" width={320} height={50} />
+          </div>
         </div>
       </header>
 

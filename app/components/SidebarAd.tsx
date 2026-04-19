@@ -24,21 +24,21 @@ export default function SidebarAd() {
         </button>
       </div>
 
-      {/* Quảng cáo 1: 160x300 */}
-      <div className="mb-6 flex justify-center">
+      {/* Quảng cáo 1: 160x600 */}
+      <div className="mb-6 flex justify-center w-full">
         <AdBanner 
-          id={process.env.NEXT_PUBLIC_ADSTERRA_SIDEBAR_ID || "YOUR_ID_HERE"} 
+          id="ccc7f576d59d1957587e538e4b3069c0" 
           width={160} 
-          height={300} 
+          height={600} 
         />
       </div>
       
-      {/* Quảng cáo 2: 300x250 */}
-      <div className="flex justify-center">
+      {/* Quảng cáo 2: 160x600 */}
+      <div className="flex justify-center w-full mb-6">
         <AdBanner 
-          id={process.env.NEXT_PUBLIC_ADSTERRA_PLAYER_ID || "YOUR_ID_HERE"} 
-          width={300} 
-          height={250} 
+          id="ccc7f576d59d1957587e538e4b3069c0" 
+          width={160} 
+          height={600} 
         />
       </div>
     </aside>
